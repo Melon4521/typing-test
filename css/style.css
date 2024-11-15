@@ -1,0 +1,56 @@
+:root {
+  --font: Inter, sans-serif;
+  --text-color: #333;
+  --bg-color: #fff;
+}
+
+/* Темная тема */
+:root[data-theme='dark'] {
+  --text-color: #fff;
+  --bg-color: #404040;
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Прижатие футера */
+.wrapper {
+  padding-top: calc((30 / 16) * 1rem);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1 1 auto;
+}
+
+[class*='__container'] {
+  max-width: calc(970px + 15px * 2);
+  padding: 0 15px;
+  margin: 0 auto;
+}
+
+/* <HEADER>============================================================================== */
+
+.header {
+  margin-bottom: 110px;
+}
+.header__body {
+  padding: calc((20 / 16) * 1rem) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc((15 / 16) * 1rem);
+}
+.header__title {
+  font-weight: 700;
+  font-size: calc((30 / 16) * 1rem);
+  line-height: calc((36 / 30) * 100%);
+}
+
+/* </HEADER>============================================================================== */
