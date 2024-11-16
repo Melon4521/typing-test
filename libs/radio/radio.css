@@ -1,0 +1,66 @@
+:root {
+  --radio-accent-h: 47;
+  --radio-accent-s: 86%;
+  --radio-accent-l: 55%;
+  --radio-accent: hsl(
+    var(--radio-accent-h),
+    var(--radio-accent-s),
+    var(--radio-accent-l)
+  );
+  --radio-border: hsl(var(--radio-accent-h), 8%, 47%);
+  --radio-size: 22px;
+  --radio-gap: 10px;
+}
+
+/* Скрываем браузерную радио-кнопку */
+.custom-radio > input[type='radio'] {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--radio-gap);
+  cursor: pointer;
+}
+
+/* Новая радио-кнопка */
+.custom-radio > input[type='radio'] + span {
+  transition: all 0.2s ease-in;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 2px;
+}
+
+.custom-radio > input[type='radio'] + span._icon-timer::before {
+  font-size: 20px;
+}
+
+/* checked */
+.custom-radio > input[type='radio']:checked + span {
+  color: var(--radio-accent);
+}
+
+/* hover */
+.custom-radio:hover
+  > input[type='radio']:not(:disabled, :focus-visible, :checked)
+  + span {
+  color: var(--text-color);
+}
+
+/* focus-visible */
+.custom-radio > input[type='radio']:focus-visible + span {
+  box-shadow: 0 0 0 2px var(--settings-panel-color);
+  border-radius: 3px;
+}
+
+/* disabled */
+.custom-radio:has(input[type='radio']:disabled) {
+  cursor: default;
+  color: hsl(0, 0%, 40%);
+}

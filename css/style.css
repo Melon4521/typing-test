@@ -1,13 +1,20 @@
 :root {
   --font: Inter, sans-serif;
-  --text-color: #333;
-  --bg-color: #fff;
+  --text-color: hsl(0, 0%, 20%);
+  --bg-color: hsl(0, 0%, 100%);
+  --settings-panel: hsl(0, 0%, 95%);
+  --settings-panel-divider: hsl(0, 0%, 80%);
+  --settings-panel-color: hsl(0, 0%, 70%);
+  --yellow: hsl(47, 86%, 55%);
 }
 
 /* Темная тема */
 :root[data-theme='dark'] {
   --text-color: #fff;
   --bg-color: #404040;
+  --settings-panel: #333;
+  --settings-panel-divider: #4d4d4d;
+
   color-scheme: dark;
 }
 
@@ -54,3 +61,45 @@ body {
 }
 
 /* </HEADER>============================================================================== */
+
+/* <SETTINGS>============================================================================== */
+
+.main__settings {
+  margin-bottom: calc((60 / 16) * 1rem);
+}
+.settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settings__body {
+  padding: 10px 15px;
+  border-radius: 10px;
+  background-color: var(--settings-panel);
+
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  row-gap: 10px;
+}
+.settings__block {
+  padding: 0 20px;
+  border-right: 3px solid var(--settings-panel-divider);
+  font-weight: 500;
+  color: var(--settings-panel-color);
+}
+.settings__block > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.settings__block:first-child {
+  padding-left: 0;
+}
+.settings__block:last-child {
+  padding-right: 0;
+  border: 0;
+}
+
+/* </SETTINGS>============================================================================== */
