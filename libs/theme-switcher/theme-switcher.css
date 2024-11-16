@@ -34,7 +34,8 @@ body {
 }
 
 #theme-switcher:focus-visible + span {
-  box-shadow: 0 0 0 3px hsla(47, 85%, 40%, 0.4);
+  box-shadow: 0 0 0 2px var(--settings-panel-color);
+  border-radius: 3px;
 }
 
 /* Без анимации переключения */

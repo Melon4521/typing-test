@@ -30,7 +30,7 @@
 
 /* Новая радио-кнопка */
 .custom-radio > input[type='radio'] + span {
-  transition: all 0.2s ease-in;
+  transition: all 0.1s ease-in;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -51,6 +51,12 @@
   > input[type='radio']:not(:disabled, :focus-visible, :checked)
   + span {
   color: var(--text-color);
+}
+
+/* active */
+.custom-radio:active > input[type='radio']:not(:disabled) + span,
+.custom-radio > input[type='radio']:active:not(:disabled) + span {
+  color: var(--checkbox-accent);
 }
 
 /* focus-visible */
