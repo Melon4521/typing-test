@@ -1,1 +1,20 @@
-{}
+{
+  "lang": {
+    "icon": "_icon-globe",
+    "type": "checkbox",
+    "checkedValue": "ru",
+    "uncheckedValue": "en"
+  },
+  "time": {
+    "title": "время",
+    "icon": "_icon-timer",
+    "type": "radio",
+    "values": [15, 30, 60, 120]
+  },
+  "words": {
+    "title": "слова",
+    "icon": "_icon-letter",
+    "type": "radio",
+    "values": [25, 50, 75, 100]
+  }
+}

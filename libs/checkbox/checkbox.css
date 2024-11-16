@@ -37,6 +37,10 @@
   padding: 5px 2px;
 }
 
+.custom-checkbox > input[type='checkbox'] + span._icon-globe::before {
+  font-size: 18px;
+}
+
 /* hover */
 .custom-checkbox:hover
   > input[type='checkbox']:not(:disabled, :focus-visible)

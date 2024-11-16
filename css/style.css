@@ -88,12 +88,15 @@ body {
   border-right: 3px solid var(--settings-panel-divider);
   font-weight: 500;
   color: var(--settings-panel-color);
-}
-.settings__block > div {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+/* .settings__block > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+} */
 .settings__block:first-child {
   padding-left: 0;
 }
