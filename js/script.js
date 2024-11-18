@@ -1,3 +1,5 @@
+settingsPanelInit();
+
 async function settingsPanelInit() {
   try {
     let response = await fetch('/api/settings.json');
@@ -129,4 +131,89 @@ async function settingsPanelInit() {
   }
 }
 
-settingsPanelInit();
+async function generateText() {
+  const settingsMode = localStorage.getItem('settings-mode') || 'words';
+  const settingsLang = localStorage.getItem('settings-lang') || 'ru';
+
+  if (settingsMode == 'words') {
+    const wordsCount = localStorage.getItem('settings-value') || 25;
+
+    try {
+      let response = await fetch('/api/texts.json');
+
+      if (response.ok) {
+        const textsJson = await response.json();
+
+        // случайный текст - вероятность 0,03 (шанс 3%)
+        if (Math.random() <= 0.03) {
+          let text = textsJson[settingsLang].ready;
+          return text[Math.floor(Math.random() * text.length)]
+            .split(' ')
+            .slice(0, wordsCount);
+        } else {
+          let randomWords = textsJson[settingsLang].random;
+          let text = [];
+
+          let nextCapital = true;
+          let punctuations = ['.', ',', ';', ':', '!', '?', '"', '-'];
+
+          for (let i = 0; i < wordsCount; i++) {
+            let word =
+              randomWords[Math.floor(Math.random() * randomWords.length)];
+
+            // если первая буква должна быть заглавной
+            if (nextCapital) {
+              word = word[0].toUpperCase() + word.slice(1, word.length);
+              nextCapital = false;
+            }
+
+            // случайный знак препинания - вероятность 0,05 (шанс 5%)
+            // note: возможно потом добавить регулирование кол-ва знаков препинания
+            if (Math.random() <= 0.05) {
+              let punctuation =
+                punctuations[Math.floor(Math.random() * punctuations.length)];
+
+              if (
+                !(
+                  word[word.length - 1] == '"' &&
+                  (punctuation == '"' || punctuation == '-')
+                )
+              ) {
+                if (
+                  punctuation == '.' ||
+                  punctuation == '!' ||
+                  punctuation == '?'
+                ) {
+                  word += punctuation;
+                  nextCapital = true;
+                } else if (punctuation == '"') {
+                  word = '"' + word + '"';
+                } else if (punctuation == '-') {
+                  word =
+                    word +
+                    '-' +
+                    randomWords[Math.floor(Math.random() * randomWords.length)];
+                } else {
+                  word += punctuation;
+                }
+              }
+            }
+
+            text.push(word);
+          }
+
+          return text;
+        }
+      } else {
+        throw new Error('Failed to fetch');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}
+
+generateText().then(text => {
+  console.log(text);
+  console.log(text.join(' '));
+});
