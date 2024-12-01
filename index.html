@@ -54,7 +54,16 @@
           </form>
           <!-- Текст -->
           <div class="main__text text">
-
+            <div class="text__placeholder" onmousedown="return false">
+              Кликните сюда или нажмите любую клавишу, чтобы
+              сфокусироваться
+            </div>
+            <div class="text__body">
+              <input type="text" class="text__input" id="typing-input">
+              <p class="text__passive" id="passive-text" onmousedown="return false"></p>
+              <p class="text__visual" id="typing-visual-text" onmousedown="return false"></p>
+              <span class="text__caret" id="typing-caret"></span>
+            </div>
           </div>
         </div>
       </div>

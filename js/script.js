@@ -1,4 +1,21 @@
-settingsPanelInit();
+async function main() {
+  await settingsPanelInit();
+
+  const text = await generateText();
+
+  const test = {
+    text: text.join(' '),
+    words: text,
+    chars: [].concat(...text.map(word => word.split(''))),
+    statistic: {},
+  };
+
+  await initPassiveText(text);
+
+  setFocusOnTypingInput();
+}
+
+main();
 
 async function settingsPanelInit() {
   try {
@@ -232,7 +249,24 @@ async function generateText() {
   }
 }
 
-generateText().then(text => {
-  console.log(text);
-  console.log(text.join(' '));
-});
+async function initPassiveText(text) {
+  const passiveText = document.querySelector('#passive-text');
+
+  for (const word of text) {
+    const span = document.createElement('span');
+    span.textContent = word;
+
+    const space = document.createElement('span');
+    space.textContent = ' ';
+
+    passiveText.append(space);
+    passiveText.append(span);
+  }
+
+  passiveText.children[0].remove();
+}
+
+function setFocusOnTypingInput() {
+  const typingInput = document.querySelector('#typing-input');
+  typingInput.focus();
+}
