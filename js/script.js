@@ -12,7 +12,7 @@ async function main() {
 
   await initPassiveText(text);
 
-  setFocusOnTypingInput();
+  setFocusActionsOnTypingInput();
 }
 
 main();
@@ -266,7 +266,50 @@ async function initPassiveText(text) {
   passiveText.children[0].remove();
 }
 
-function setFocusOnTypingInput() {
+function setFocusActionsOnTypingInput() {
   const typingInput = document.querySelector('#typing-input');
+  const placeholder = document.querySelector('.text__placeholder');
+
   typingInput.focus();
+
+  typingInput.addEventListener('blur', () => {
+    if (!placeholder.classList.contains('_blur')) {
+      placeholder.classList.add('_blur');
+
+      placeholder.onclick = () => {
+        typingInput.focus();
+      };
+
+      document.addEventListener('keydown', onKeyDown);
+    }
+  });
+
+  typingInput.addEventListener('focus', () => {
+    if (placeholder.classList.contains('_blur')) {
+      placeholder.classList.remove('_blur');
+
+      placeholder.onclick = null;
+      document.removeEventListener('keydown', onKeyDown);
+    }
+  });
+
+  function onKeyDown(e) {
+    if (
+      ![
+        'Tab',
+        'Enter',
+        'Space',
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+      ].includes(e.code) &&
+      !e.shiftKey &&
+      !e.altKey &&
+      !e.metaKey &&
+      !e.ctrlKey
+    ) {
+      typingInput.focus();
+    }
+  }
 }
