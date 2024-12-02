@@ -19,7 +19,7 @@ main();
 
 async function settingsPanelInit() {
   try {
-    let response = await fetch('/api/settings.json');
+    let response = await fetch('api/settings.json');
 
     if (response.ok) {
       let settingsJson = await response.json();
@@ -176,7 +176,7 @@ async function generateText() {
   }
 
   try {
-    let response = await fetch('/api/texts.json');
+    let response = await fetch('api/texts.json');
 
     if (response.ok) {
       const textsJson = await response.json();
