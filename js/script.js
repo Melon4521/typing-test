@@ -1,7 +1,38 @@
 async function main() {
-  await settingsPanelInit();
+  try {
+    const settingsResponse = await fetch('api/settings.json');
 
-  const text = await generateText();
+    if (settingsResponse.ok) {
+      const settingsJson = await settingsResponse.json();
+      settingsPanelInit(settingsJson);
+    } else {
+      throw new Error('Failed to fetch');
+    }
+
+    const textsResponse = await fetch('api/texts.json');
+
+    if (textsResponse.ok) {
+      const textsJson = await textsResponse.json();
+      sessionStorage.setItem('texts-json', JSON.stringify(textsJson));
+    } else {
+      throw new Error('Failed to fetch');
+    }
+
+    setFocusActionsOnTypingInput();
+
+    startTest();
+  } catch (err) {
+    if (err.message == 'Failed to fetch') {
+      console.log(err);
+    } else throw err;
+  }
+}
+
+main();
+
+function startTest() {
+  let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
+  const text = generateText(textsJson);
 
   const test = {
     text: text.join(' '),
@@ -10,160 +41,143 @@ async function main() {
     statistic: {},
   };
 
-  await initPassiveText(text);
-
-  setFocusActionsOnTypingInput();
+  initPassiveText(text);
 }
 
-main();
+function settingsPanelInit(settingsJson) {
+  const settingsLang = document.querySelector('#settings-lang');
+  const settingsMode = document.querySelector('#settings-mode');
+  const settingsValue = document.querySelector('#settings-value');
 
-async function settingsPanelInit() {
-  try {
-    let response = await fetch('api/settings.json');
-
-    if (response.ok) {
-      let settingsJson = await response.json();
-
-      const settingsLang = document.querySelector('#settings-lang');
-      const settingsMode = document.querySelector('#settings-mode');
-      const settingsValue = document.querySelector('#settings-value');
-
-      // #lang checkbox
-      let settingsLangValue = localStorage.getItem('settings-lang');
-
-      if (settingsLangValue == null) {
-        localStorage.setItem('settings-lang', settingsJson.lang.checkedValue);
-        settingsLangValue = settingsJson.lang.checkedValue;
-      }
-
-      settingsLang.insertAdjacentHTML(
-        'beforeend',
-        /* html */ `
-        <label class="custom-checkbox">
-          <input ${
-            settingsLangValue == settingsJson.lang.checkedValue ? 'checked' : ''
-          } type="checkbox" name="settings-lang" value="${settingsLangValue}">
-          <span class="${settingsJson.lang.icon}">
-            ${settingsLangValue}
-          </span>
-        </label>  
-      `,
-      );
-
-      // смена языка
-      const langCheckbox = settingsLang.querySelector('input[type="checkbox"]');
-      const langCheckboxSpan = langCheckbox.nextElementSibling;
-
-      langCheckboxSpan.textContent = langCheckbox.checked
-        ? settingsJson.lang.checkedValue
-        : settingsJson.lang.uncheckedValue;
-
-      langCheckbox.onchange = () => {
-        langCheckboxSpan.textContent = langCheckbox.value = langCheckbox.checked
-          ? settingsJson.lang.checkedValue
-          : settingsJson.lang.uncheckedValue;
-        localStorage.setItem('settings-lang', langCheckbox.value);
-      };
-
-      langCheckbox.closest('.custom-checkbox').onmousedown = () => {
+  // отмена выделения текста
+  settingsLang.onmousedown =
+    settingsMode.onmousedown =
+    settingsValue.onmousedown =
+      () => {
         return false;
       };
 
-      // #mode radios
-      let modeList = ['words', 'time'];
-      let settingsModeValue = localStorage.getItem('settings-mode');
+  //# LANG
+  let settingsLangValue = localStorage.getItem('settings-lang');
 
-      if (!modeList.includes(settingsModeValue)) {
-        localStorage.setItem('settings-mode', modeList[0]);
-        settingsModeValue = modeList[0];
-      }
+  if (settingsLangValue == null) {
+    localStorage.setItem('settings-lang', settingsJson.lang.checkedValue);
+    settingsLangValue = settingsJson.lang.checkedValue;
+  }
 
-      for (const mode of modeList) {
-        let modeJson = settingsJson[mode];
+  settingsLang.insertAdjacentHTML(
+    'beforeend',
+    /* html */ `
+      <label class="custom-checkbox">
+        <input ${
+          settingsLangValue == settingsJson.lang.checkedValue ? 'checked' : ''
+        } type="checkbox" name="settings-lang" value="${settingsLangValue}">
+        <span class="${settingsJson.lang.icon}">
+          ${settingsLangValue}
+        </span>
+      </label>  
+    `,
+  );
 
-        settingsMode.insertAdjacentHTML(
-          'beforeend',
-          /* html */ `
+  // смена языка
+  const langCheckbox = settingsLang.querySelector('input[type="checkbox"]');
+  const langCheckboxSpan = langCheckbox.nextElementSibling;
+
+  langCheckboxSpan.textContent = langCheckbox.checked
+    ? settingsJson.lang.checkedValue
+    : settingsJson.lang.uncheckedValue;
+
+  // изменение языка
+  langCheckbox.onchange = function () {
+    langCheckboxSpan.textContent = langCheckbox.value = langCheckbox.checked
+      ? settingsJson.lang.checkedValue
+      : settingsJson.lang.uncheckedValue;
+    localStorage.setItem('settings-lang', langCheckbox.value);
+    startTest();
+    focusTypingInput();
+  };
+
+  //# MODE
+  let modeList = ['words', 'time'];
+  let settingsModeValue = localStorage.getItem('settings-mode');
+
+  if (!modeList.includes(settingsModeValue)) {
+    localStorage.setItem('settings-mode', modeList[0]);
+    settingsModeValue = modeList[0];
+  }
+
+  for (const mode of modeList) {
+    let modeJson = settingsJson[mode];
+
+    settingsMode.insertAdjacentHTML(
+      'beforeend',
+      /* html */ `
+          <label class="custom-radio">
+            <input type="radio" name="settings-mode" value="${mode}">
+            <span class="${modeJson.icon}">${modeJson.title}</span>
+          </label>
+        `,
+    );
+  }
+
+  // делегируем изменение режима
+  settingsMode.addEventListener('change', function (e) {
+    localStorage.setItem('settings-mode', e.target.value);
+    initSettingsValue(e.target.value);
+    startTest();
+    focusTypingInput();
+  });
+
+  // выбираем нужный режим
+  settingsMode.querySelector(
+    `input[value='${settingsModeValue}']`,
+  ).checked = true;
+
+  //# VALUE
+  initSettingsValue(
+    settingsModeValue,
+    localStorage.getItem('settings-value') || 'default',
+  );
+
+  function initSettingsValue(mode, checkedValue = 'default') {
+    let valueList = settingsJson[mode].values;
+    settingsValue.innerHTML = '';
+
+    for (const value of valueList) {
+      settingsValue.insertAdjacentHTML(
+        'beforeend',
+        /* html */ `
             <label class="custom-radio">
-              <input type="radio" name="settings-mode" value="${mode}">
-              <span class="${modeJson.icon}">${modeJson.title}</span>
+              <input type="radio" name="settings-value" value="${value}">
+              <span>${value}</span>
             </label>
           `,
-        );
-
-        settingsMode.children[settingsMode.children.length - 1].onchange =
-          e => {
-            localStorage.setItem('settings-mode', e.target.value);
-            initSettingsValue(e.target.value);
-          };
-
-        settingsMode.children[settingsMode.children.length - 1].onmousedown =
-          () => {
-            return false;
-          };
-      }
-
-      settingsMode.children[modeList.indexOf(settingsModeValue)].querySelector(
-        'input[type="radio"]',
-      ).checked = true;
-
-      // #value radios
-      initSettingsValue(
-        settingsModeValue,
-        localStorage.getItem('settings-value') || 'default',
       );
-
-      function initSettingsValue(mode, checkedValue = 'default') {
-        let valueList = settingsJson[mode].values;
-        settingsValue.innerHTML = '';
-
-        for (const value of valueList) {
-          settingsValue.insertAdjacentHTML(
-            'beforeend',
-            /* html */ `
-              <label class="custom-radio">
-                <input type="radio" name="settings-value" value="${value}">
-                <span>${value}</span>
-              </label>
-            `,
-          );
-
-          settingsValue.children[settingsValue.children.length - 1].onchange =
-            e => {
-              localStorage.setItem('settings-value', e.target.value);
-            };
-
-          settingsValue.children[
-            settingsValue.children.length - 1
-          ].onmousedown = () => {
-            return false;
-          };
-        }
-
-        let activeRadio;
-
-        if (checkedValue == 'default') {
-          activeRadio = settingsValue.children[0].querySelector(
-            'input[type="radio"]',
-          );
-        } else {
-          activeRadio = settingsValue.children[
-            valueList.indexOf(+checkedValue) || 0
-          ].querySelector('input[type="radio"]');
-        }
-
-        activeRadio.checked = true;
-        localStorage.setItem('settings-value', activeRadio.value);
-      }
-    } else {
-      throw new Error('Failed to fetch');
     }
-  } catch (err) {
-    console.log(err);
+
+    // делегируем изменение значения
+    settingsValue.addEventListener('change', function (e) {
+      localStorage.setItem('settings-value', e.target.value);
+      startTest();
+      focusTypingInput();
+    });
+
+    let activeRadio;
+
+    if (checkedValue == 'default') {
+      activeRadio = settingsValue.querySelector('input[type="radio"]');
+    } else {
+      activeRadio = settingsValue.querySelector(
+        `input[value='${checkedValue}']`,
+      );
+    }
+
+    activeRadio.checked = true;
+    localStorage.setItem('settings-value', activeRadio.value);
   }
 }
 
-async function generateText() {
+function generateText(textsJson) {
   const settingsMode = localStorage.getItem('settings-mode') || 'words';
   const settingsLang = localStorage.getItem('settings-lang') || 'ru';
 
@@ -175,82 +189,66 @@ async function generateText() {
     wordsCount = 500;
   }
 
-  try {
-    let response = await fetch('api/texts.json');
+  // случайный текст - вероятность 0,03 (шанс 3%)
+  if (Math.random() <= 0.03) {
+    let text = textsJson[settingsLang].ready;
+    return text[Math.floor(Math.random() * text.length)]
+      .split(' ')
+      .slice(0, wordsCount);
+  } else {
+    let randomWords = textsJson[settingsLang].random;
+    let text = [];
 
-    if (response.ok) {
-      const textsJson = await response.json();
+    let nextCapital = true;
+    let punctuations = ['.', ',', ';', ':', '!', '?', '"', '-'];
 
-      // случайный текст - вероятность 0,03 (шанс 3%)
-      if (Math.random() <= 0.03) {
-        let text = textsJson[settingsLang].ready;
-        return text[Math.floor(Math.random() * text.length)]
-          .split(' ')
-          .slice(0, wordsCount);
-      } else {
-        let randomWords = textsJson[settingsLang].random;
-        let text = [];
+    for (let i = 0; i < wordsCount; i++) {
+      let word = randomWords[Math.floor(Math.random() * randomWords.length)];
 
-        let nextCapital = true;
-        let punctuations = ['.', ',', ';', ':', '!', '?', '"', '-'];
-
-        for (let i = 0; i < wordsCount; i++) {
-          let word =
-            randomWords[Math.floor(Math.random() * randomWords.length)];
-
-          // если первая буква должна быть заглавной
-          if (nextCapital) {
-            word = word[0].toUpperCase() + word.slice(1, word.length);
-            nextCapital = false;
-          }
-
-          // случайный знак препинания - вероятность 0,05 (шанс 5%)
-          // note: возможно потом добавить регулирование кол-ва знаков препинания
-          if (Math.random() <= 0.05) {
-            let punctuation =
-              punctuations[Math.floor(Math.random() * punctuations.length)];
-
-            if (
-              !(
-                word[word.length - 1] == '"' &&
-                (punctuation == '"' || punctuation == '-')
-              )
-            ) {
-              if (
-                punctuation == '.' ||
-                punctuation == '!' ||
-                punctuation == '?'
-              ) {
-                word += punctuation;
-                nextCapital = true;
-              } else if (punctuation == '"') {
-                word = '"' + word + '"';
-              } else if (punctuation == '-') {
-                word =
-                  word +
-                  '-' +
-                  randomWords[Math.floor(Math.random() * randomWords.length)];
-              } else {
-                word += punctuation;
-              }
-            }
-          }
-
-          text.push(word);
-        }
-
-        return text;
+      // если первая буква должна быть заглавной
+      if (nextCapital) {
+        word = word[0].toUpperCase() + word.slice(1, word.length);
+        nextCapital = false;
       }
-    } else {
-      throw new Error('Failed to fetch');
+
+      // случайный знак препинания - вероятность 0,05 (шанс 5%)
+      // note: возможно потом добавить регулирование кол-ва знаков препинания
+      if (Math.random() <= 0.05) {
+        let punctuation =
+          punctuations[Math.floor(Math.random() * punctuations.length)];
+
+        if (
+          !(
+            word[word.length - 1] == '"' &&
+            (punctuation == '"' || punctuation == '-')
+          )
+        ) {
+          if (punctuation == '.' || punctuation == '!' || punctuation == '?') {
+            word += punctuation;
+            nextCapital = true;
+          } else if (punctuation == '"') {
+            word = '"' + word + '"';
+          } else if (punctuation == '-') {
+            word =
+              word +
+              '-' +
+              randomWords[Math.floor(Math.random() * randomWords.length)];
+          } else {
+            word += punctuation;
+          }
+        }
+      }
+
+      text.push(word);
     }
-  } catch (err) {
-    console.log(err);
+
+    return text;
   }
 }
 
-async function initPassiveText(text) {
+function initPassiveText(text) {
   const passiveText = document.querySelector('#passive-text');
+  passiveText.innerHTML = '';
 
   for (const word of text) {
     const span = document.createElement('span');
@@ -270,14 +268,14 @@ function setFocusActionsOnTypingInput() {
   const typingInput = document.querySelector('#typing-input');
   const placeholder = document.querySelector('.text__placeholder');
 
-  typingInput.focus();
+  focusTypingInput();
 
   typingInput.addEventListener('blur', () => {
     if (!placeholder.classList.contains('_blur')) {
       placeholder.classList.add('_blur');
 
       placeholder.onclick = () => {
-        typingInput.focus();
+        focusTypingInput();
       };
 
       document.addEventListener('keydown', onKeyDown);
@@ -309,7 +307,12 @@ function setFocusActionsOnTypingInput() {
       !e.metaKey &&
       !e.ctrlKey
     ) {
-      typingInput.focus();
+      focusTypingInput();
     }
   }
+}
+
+function focusTypingInput() {
+  const typingInput = document.querySelector('#typing-input');
+  typingInput.focus();
 }
