@@ -1,5 +1,6 @@
 async function main() {
   try {
+    // получаем json настроек
     const settingsResponse = await fetch('api/settings.json');
 
     if (settingsResponse.ok) {
@@ -9,6 +10,7 @@ async function main() {
       throw new Error('Failed to fetch');
     }
 
+    // получаем и сохраняем json текстов
     const textsResponse = await fetch('api/texts.json');
 
     if (textsResponse.ok) {
@@ -20,7 +22,7 @@ async function main() {
 
     setFocusActionsOnTypingInput();
 
-    startTest();
+    newTest();
   } catch (err) {
     if (err.message == 'Failed to fetch') {
       console.log(err);
@@ -30,9 +32,11 @@ async function main() {
 
 main();
 
-function startTest() {
+function newTest() {
   let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
   const text = generateText(textsJson);
+
+  initPassiveText(text);
 
   const test = {
     text: text.join(' '),
@@ -41,7 +45,99 @@ function startTest() {
     statistic: {},
   };
 
-  initPassiveText(text);
+  const typingInput = document.querySelector('#typing-input');
+  typingInput.value = '';
+
+  let typedWords = [];
+  let currentWordIndex = 0;
+  let activeWord = null;
+  let lastIncorrectWord = null;
+  let incorrectTypedCharsInEnd = 0;
+  let incorrectTypedChars = new Set();
+
+  let currentCharIndex = 0;
+  let prevInputLength = 0;
+  let newInputLength = 0;
+  let currentChar = null;
+
+  let startTime = 0;
+  let endTime = 0;
+
+  // Начинаем тест при вводе
+  typingInput.oninput = function (e) {
+    // console.log(typingInput.value);
+    let statisticKey =
+      currentWordIndex == 0
+        ? activeWord
+        : typedWords.join(' ') + ' ' + activeWord;
+
+    if (activeWord == null) {
+      currentCharIndex = 0;
+      prevInputLength = 0;
+      newInputLength = 0;
+      activeWord = test.words[currentWordIndex];
+      currentChar = activeWord[0];
+
+      test.statistic[statisticKey] = {
+        corrects: [],
+        incorrects: [],
+        chars: {},
+      };
+
+      if (currentWordIndex == 0) {
+        startTime = Date.now();
+      }
+    }
+
+    newInputLength = typingInput.value.length;
+
+    let wordStatistic = test.statistic[statisticKey];
+    let lengthDelta = newInputLength - prevInputLength;
+    let typedChar = typingInput.value[-1];
+
+    if (lengthDelta > 0) {
+      endTime = Date.now();
+
+      let wordState = activeWord.slice(0, currentCharIndex + 1);
+
+      if (typedChar === currentChar) {
+        // набран верный символ
+        wordStatistic.corrects.push(wordState);
+
+        if (!(currentWordIndex == 0 && currentCharIndex == 0)) {
+          if (wordStatistic.chars[wordState] !== undefined) {
+            wordStatistic.chars[wordState] =
+              endTime - Number(wordStatistic.chars[wordState]);
+          } else {
+            wordStatistic.chars[wordState] = endTime - startTime;
+          }
+        }
+      } else {
+        wordStatistic.incorrects.push(wordState);
+        incorrectTypedChars.add(typedWords.join(' ') + ' ' + wordState);
+
+        if (wordStatistic.chars[wordState] === undefined) {
+          wordStatistic.chars[wordState] = String(startTime);
+        }
+      }
+
+      currentCharIndex += 1;
+      currentChar = activeWord[currentCharIndex];
+      startTime = Date.now();
+      prevInputLength = newInputLength;
+    }
+  };
+
+  // нажаты стрелки/delete - игнорируем
+  typingInput.onkeydown = e => {
+    if (
+      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete'].includes(
+        e.code,
+      )
+    ) {
+      e.preventDefault();
+    }
+  };
 }
 
 function settingsPanelInit(settingsJson) {
@@ -79,7 +175,6 @@ function settingsPanelInit(settingsJson) {
     `,
   );
 
-  // смена языка
   const langCheckbox = settingsLang.querySelector('input[type="checkbox"]');
   const langCheckboxSpan = langCheckbox.nextElementSibling;
 
@@ -93,7 +188,7 @@ function settingsPanelInit(settingsJson) {
       ? settingsJson.lang.checkedValue
       : settingsJson.lang.uncheckedValue;
     localStorage.setItem('settings-lang', langCheckbox.value);
-    startTest();
+    newTest();
     focusTypingInput();
   };
 
@@ -124,7 +219,7 @@ function settingsPanelInit(settingsJson) {
   settingsMode.addEventListener('change', function (e) {
     localStorage.setItem('settings-mode', e.target.value);
     initSettingsValue(e.target.value);
-    startTest();
+    newTest();
     focusTypingInput();
   });
 
@@ -158,7 +253,7 @@ function settingsPanelInit(settingsJson) {
     // делегируем изменение значения
     settingsValue.addEventListener('change', function (e) {
       localStorage.setItem('settings-value', e.target.value);
-      startTest();
+      newTest();
       focusTypingInput();
     });
 
@@ -183,13 +278,11 @@ function generateText(textsJson) {
 
   let wordsCount = localStorage.getItem('settings-value') || 25;
 
-  if (settingsMode == 'words') {
-    wordsCount = localStorage.getItem('settings-value') || 25;
-  } else {
+  if (settingsMode == 'time') {
     wordsCount = 500;
   }
 
-  // случайный текст - вероятность 0,03 (шанс 3%)
+  // готовый текст - вероятность 0,03 (шанс 3%)
   if (Math.random() <= 0.03) {
     let text = textsJson[settingsLang].ready;
     return text[Math.floor(Math.random() * text.length)]
@@ -257,10 +350,10 @@ function initPassiveText(text) {
     const space = document.createElement('span');
     space.textContent = ' ';
 
-    passiveText.append(space);
-    passiveText.append(span);
+    passiveText.append(space, span);
   }
 
+  // первый пробел
   passiveText.children[0].remove();
 }
 
