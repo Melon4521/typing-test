@@ -95,41 +95,140 @@ function newTest() {
     let lengthDelta = newInputLength - prevInputLength;
     let typedChar = typingInput.value[-1];
 
+    // # длина увеличилась - символ ввели
     if (lengthDelta > 0) {
-      endTime = Date.now();
+      // еще не дошли до конца слова
+      if (currentChar !== undefined) {
+        endTime = Date.now();
 
-      let wordState = activeWord.slice(0, currentCharIndex + 1);
+        let wordState = activeWord.slice(0, currentCharIndex + 1);
 
-      if (typedChar === currentChar) {
         // набран верный символ
-        wordStatistic.corrects.push(wordState);
+        if (typedChar === currentChar) {
+          wordStatistic.corrects.push(wordState);
 
-        if (!(currentWordIndex == 0 && currentCharIndex == 0)) {
-          if (wordStatistic.chars[wordState] !== undefined) {
-            wordStatistic.chars[wordState] =
-              endTime - Number(wordStatistic.chars[wordState]);
-          } else {
-            wordStatistic.chars[wordState] = endTime - startTime;
+          if (!(currentWordIndex == 0 && currentCharIndex == 0)) {
+            if (wordStatistic.chars[wordState] !== undefined) {
+              wordStatistic.chars[wordState] =
+                endTime - Number(wordStatistic.chars[wordState]);
+            } else {
+              wordStatistic.chars[wordState] = endTime - startTime;
+            }
+          }
+        } else {
+          // набран неверный символ
+          wordStatistic.incorrects.push(wordState);
+          incorrectTypedChars.add(
+            currentWordIndex == 0
+              ? wordState
+              : typedWords.join(' ') + ' ' + wordState,
+          );
+
+          if (wordStatistic.chars[wordState] === undefined) {
+            wordStatistic.chars[wordState] = String(startTime);
           }
         }
-      } else {
-        wordStatistic.incorrects.push(wordState);
-        incorrectTypedChars.add(typedWords.join(' ') + ' ' + wordState);
 
-        if (wordStatistic.chars[wordState] === undefined) {
-          wordStatistic.chars[wordState] = String(startTime);
+        currentCharIndex++;
+        currentChar = activeWord[currentCharIndex];
+        startTime = Date.now();
+        prevInputLength = newInputLength;
+      } else {
+        // конец слова - ожидается пробел
+        if (typedChar === ' ') {
+          if (lastIncorrectWord !== null) {
+            let prevWordStatistic = test.statistic[typedWords.join(' ')];
+
+            for (const key of prevWordStatistic.incorrects) {
+              prevWordStatistic.chars[key] =
+                endTime - Number(prevWordStatistic.chars[key]);
+            }
+          }
+
+          if (wordStatistic.length == 0) {
+            lastIncorrectWord = null;
+          } else {
+            lastIncorrectWord = {
+              value: typingInput.value.slice(0, typingInput.value.length - 1),
+              wordIndex: currentWordIndex,
+              charIndex: currentCharIndex,
+            };
+          }
+
+          typingInput.value = '';
+          startTime = Date.now();
+          currentWordIndex++;
+          typedWords.push(activeWord);
+          activeWord = null;
+          incorrectTypedCharsInEnd = 0;
+        } else {
+          if (incorrectTypedCharsInEnd <= 5) {
+            incorrectTypedCharsInEnd++;
+            currentCharIndex++;
+            currentChar = activeWord[currentCharIndex];
+            prevInputLength = newInputLength;
+          }
         }
       }
 
-      currentCharIndex += 1;
+      // # конец теста
+      if (
+        currentWordIndex == test.words.length - 1 &&
+        currentCharIndex == test.words.at(-1).length &&
+        typedChar == test.words.at(-1).at(-1)
+      ) {
+        if (lastIncorrectWord !== null) {
+          let prevWordStatistic = test.statistic[typedWords.join(' ')];
+
+          for (const key of prevWordStatistic.incorrects) {
+            prevWordStatistic.chars[key] =
+              endTime - Number(prevWordStatistic.chars[key]);
+          }
+        }
+
+        if (wordStatistic.incorrects.length != 0) {
+          for (const key of wordStatistic.incorrects) {
+            wordStatistic.chars[key] =
+              endTime - Number(wordStatistic.chars[key]);
+          }
+        }
+
+        finishTest(test);
+      }
+    } else {
+      // # длина уменьшилась - символ удалили
+      if (currentCharIndex <= activeWord.length) {
+        let previousWordState = activeWord.slice(0, currentCharIndex);
+
+        if (wordStatistic.corrects.includes(previousWordState)) {
+          wordStatistic.corrects.splice(
+            wordStatistic.corrects.indexOf(previousWordState),
+            1,
+          );
+        } else {
+          wordStatistic.incorrects.splice(
+            wordStatistic.incorrects.indexOf(previousWordState),
+            1,
+          );
+        }
+
+        if (typeof wordStatistic.chars[previousWordState] == 'number') {
+          delete wordStatistic.chars[previousWordState];
+        }
+
+        startTime = Date.now();
+      } else {
+        incorrectTypedCharsInEnd--;
+      }
+
+      currentCharIndex--;
       currentChar = activeWord[currentCharIndex];
-      startTime = Date.now();
       prevInputLength = newInputLength;
     }
   };
 
-  // нажаты стрелки/delete - игнорируем
   typingInput.onkeydown = e => {
+    // нажаты стрелки/delete - игнорируем
     if (
       ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete'].includes(
         e.code,
@@ -137,7 +236,57 @@ function newTest() {
     ) {
       e.preventDefault();
     }
+
+    // переход к предыдущему слову
+    if (
+      e.code == 'Backspace' &&
+      typingInput.value.length == 0 &&
+      currentWordIndex !== 0 &&
+      lastIncorrectWord !== null
+    ) {
+      typingInput.value = lastIncorrectWord.value;
+      newInputLength = prevInputLength = typingInput.value.length;
+      currentWordIndex = lastIncorrectWord.wordIndex;
+      currentCharIndex = lastIncorrectWord.charIndex;
+      activeWord = test.words[currentWordIndex];
+      typedWords.pop();
+      startTime = Date.now();
+      lastIncorrectWord = null;
+    }
+
+    // Ctrl + Backspace
+    if (e.code == 'Backspace' && e.ctrlKey) {
+      e.preventDefault();
+
+      typingInput.value = '';
+      currentCharIndex = prevInputLength = newInputLength = 0;
+      currentChar = activeWord[currentCharIndex];
+
+      let wordStatistic =
+        test.statistic[
+          currentWordIndex == 0
+            ? activeWord
+            : typedWords.join(' ') + ' ' + activeWord
+        ];
+
+      wordStatistic.corrects.length = 0;
+      wordStatistic.incorrects.length = 0;
+
+      for (const [key, value] of Object.entries(wordStatistic.chars)) {
+        if (typeof value == 'number') {
+          delete wordStatistic.chars[key];
+        }
+      }
+
+      startTime = Date.now();
+      incorrectTypedCharsInEnd = 0;
+    }
   };
+}
+
+function finishTest(test) {
+  console.log(test);
+  typingInput.oninput = null;
 }
 
 function settingsPanelInit(settingsJson) {
