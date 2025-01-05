@@ -47,6 +47,29 @@ function newTest() {
 
   const typingInput = document.querySelector('#typing-input');
   typingInput.value = '';
+  // typingInput.onfocus = null;
+
+  // // прерывание теста через 5 сек при потере фокуса
+  // typingInput.onblur = function () {
+  //   let timerId = null;
+
+  //   Promise.race([
+  //     new Promise(resolve => {
+  //       timerId = setTimeout(() => {
+  //         abortTest();
+  //         typingInput.onblur = null;
+  //         resolve('Время вышло');
+  //       }, 5000);
+  //     }),
+  //     new Promise(resolve => {
+  //       typingInput.onfocus = function () {
+  //         clearTimeout(timerId);
+  //         typingInput.onfocus = null;
+  //         resolve('Тест продолжен');
+  //       };
+  //     }),
+  //   ]).then(res => console.log(res));
+  // };
 
   let typedWords = [];
   let currentWordIndex = 0;
@@ -68,8 +91,8 @@ function newTest() {
     // console.log(typingInput.value);
     let statisticKey =
       currentWordIndex == 0
-        ? activeWord
-        : typedWords.join(' ') + ' ' + activeWord;
+        ? test.words[currentWordIndex]
+        : typedWords.join(' ') + ' ' + test.words[currentWordIndex];
 
     if (activeWord == null) {
       currentCharIndex = 0;
@@ -93,7 +116,9 @@ function newTest() {
 
     let wordStatistic = test.statistic[statisticKey];
     let lengthDelta = newInputLength - prevInputLength;
-    let typedChar = typingInput.value[-1];
+    let typedChar = typingInput.value.at(-1);
+
+    console.log(wordStatistic);
 
     // # длина увеличилась - символ ввели
     if (lengthDelta > 0) {
@@ -193,7 +218,7 @@ function newTest() {
           }
         }
 
-        finishTest(test);
+        finishTest(test, incorrectTypedChars);
       }
     } else {
       // # длина уменьшилась - символ удалили
@@ -284,9 +309,46 @@ function newTest() {
   };
 }
 
-function finishTest(test) {
+function finishTest(test, incorrectTypedChars) {
   console.log(test);
+  const typingInput = document.querySelector('#typing-input');
   typingInput.oninput = null;
+
+  let [totalMilliseconds, totalCharsCount] = Object.values(
+    test.statistic,
+  ).reduce(
+    ([sum, count], wordStatistic) => {
+      console.log(wordStatistic);
+      for (let key in wordStatistic.chars) {
+        sum += wordStatistic.chars[key];
+        count++;
+      }
+
+      return [sum, count];
+    },
+    [0, 0],
+  );
+
+  let totalMinutes = totalMilliseconds / 1000 / 60;
+
+  console.log(totalMinutes);
+
+  // # WPM
+  let wpm = test.words.length / totalMinutes;
+
+  // # CPM
+  let cpm = totalCharsCount / totalMinutes;
+
+  // # Accurancy
+  let mistakes = incorrectTypedChars.size;
+  let accurancy = (1 - mistakes / totalCharsCount) * 100;
+
+  console.log('wpm: ' + wpm, 'cpm: ' + cpm, 'accurancy: ' + accurancy);
+}
+
+function abortTest() {
+  console.log('Тест прерван');
+  newTest();
 }
 
 function settingsPanelInit(settingsJson) {
