@@ -32,6 +32,8 @@ async function main() {
 
 main();
 
+//<Test>==============================================================================
+
 function newTest() {
   let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
   const text = generateText(textsJson);
@@ -88,7 +90,6 @@ function newTest() {
 
   // Начинаем тест при вводе
   typingInput.oninput = function (e) {
-    // console.log(typingInput.value);
     let statisticKey =
       currentWordIndex == 0
         ? test.words[currentWordIndex]
@@ -99,7 +100,7 @@ function newTest() {
       prevInputLength = 0;
       newInputLength = 0;
       activeWord = test.words[currentWordIndex];
-      currentChar = activeWord[0];
+      currentChar = activeWord[currentCharIndex];
 
       test.statistic[statisticKey] = {
         corrects: [],
@@ -109,40 +110,40 @@ function newTest() {
 
       if (currentWordIndex == 0) {
         startTime = Date.now();
+        addWord();
       }
     }
 
     newInputLength = typingInput.value.length;
 
     let wordStatistic = test.statistic[statisticKey];
-    let lengthDelta = newInputLength - prevInputLength;
     let typedChar = typingInput.value.at(-1);
 
-    console.log(wordStatistic);
-
     // # длина увеличилась - символ ввели
-    if (lengthDelta > 0) {
+    if (newInputLength - prevInputLength > 0) {
       // еще не дошли до конца слова
       if (currentChar !== undefined) {
         endTime = Date.now();
 
         let wordState = activeWord.slice(0, currentCharIndex + 1);
+        let isCorrect;
 
         // набран верный символ
         if (typedChar === currentChar) {
+          isCorrect = true;
           wordStatistic.corrects.push(wordState);
 
-          if (!(currentWordIndex == 0 && currentCharIndex == 0)) {
-            if (wordStatistic.chars[wordState] !== undefined) {
-              wordStatistic.chars[wordState] =
-                endTime - Number(wordStatistic.chars[wordState]);
-            } else {
-              wordStatistic.chars[wordState] = endTime - startTime;
-            }
+          if (wordStatistic.chars[wordState] !== undefined) {
+            wordStatistic.chars[wordState] =
+              endTime - Number(wordStatistic.chars[wordState]);
+          } else {
+            wordStatistic.chars[wordState] = endTime - startTime;
           }
         } else {
           // набран неверный символ
+          isCorrect = false;
           wordStatistic.incorrects.push(wordState);
+
           incorrectTypedChars.add(
             currentWordIndex == 0
               ? wordState
@@ -154,13 +155,16 @@ function newTest() {
           }
         }
 
+        addChar(typedChar, isCorrect, currentCharIndex, statisticKey);
         currentCharIndex++;
         currentChar = activeWord[currentCharIndex];
         startTime = Date.now();
         prevInputLength = newInputLength;
       } else {
+        console.log('До:', incorrectTypedCharsInEnd);
         // конец слова - ожидается пробел
         if (typedChar === ' ') {
+          // NOTE: endTime = Date.now(); <<< ПРОДУМАТЬ ЭТО ПОЗЖЕ
           if (lastIncorrectWord !== null) {
             let prevWordStatistic = test.statistic[typedWords.join(' ')];
 
@@ -170,13 +174,17 @@ function newTest() {
             }
           }
 
-          if (wordStatistic.length == 0) {
+          if (
+            wordStatistic.incorrects.length == 0 &&
+            incorrectTypedCharsInEnd == 0
+          ) {
             lastIncorrectWord = null;
           } else {
             lastIncorrectWord = {
               value: typingInput.value.slice(0, typingInput.value.length - 1),
               wordIndex: currentWordIndex,
               charIndex: currentCharIndex,
+              incorrectTypedCharsInEnd,
             };
           }
 
@@ -186,14 +194,20 @@ function newTest() {
           typedWords.push(activeWord);
           activeWord = null;
           incorrectTypedCharsInEnd = 0;
+          addChar(typedChar, true);
+          addWord();
         } else {
           if (incorrectTypedCharsInEnd <= 5) {
             incorrectTypedCharsInEnd++;
             currentCharIndex++;
             currentChar = activeWord[currentCharIndex];
             prevInputLength = newInputLength;
+            addChar(typedChar, false, currentCharIndex, statisticKey, true);
+          } else {
+            typingInput.value = typingInput.value.slice(0, -1);
           }
         }
+        console.log('После:', incorrectTypedCharsInEnd);
       }
 
       // # конец теста
@@ -242,14 +256,18 @@ function newTest() {
         }
 
         startTime = Date.now();
+        removeChar(currentCharIndex - 1, statisticKey);
       } else {
         incorrectTypedCharsInEnd--;
+        removeChar(null, statisticKey, true);
       }
 
       currentCharIndex--;
       currentChar = activeWord[currentCharIndex];
       prevInputLength = newInputLength;
     }
+
+    // console.log(typingInput.value, typingInput.value.length);
   };
 
   typingInput.onkeydown = e => {
@@ -265,34 +283,41 @@ function newTest() {
     // переход к предыдущему слову
     if (
       e.code == 'Backspace' &&
+      !e.ctrlKey &&
       typingInput.value.length == 0 &&
       currentWordIndex !== 0 &&
       lastIncorrectWord !== null
     ) {
+      e.preventDefault();
+
       typingInput.value = lastIncorrectWord.value;
       newInputLength = prevInputLength = typingInput.value.length;
       currentWordIndex = lastIncorrectWord.wordIndex;
       currentCharIndex = lastIncorrectWord.charIndex;
       activeWord = test.words[currentWordIndex];
+      incorrectTypedCharsInEnd = lastIncorrectWord.incorrectTypedCharsInEnd;
+
       typedWords.pop();
       startTime = Date.now();
       lastIncorrectWord = null;
+
+      removeWord();
+      console.log('remove', incorrectTypedCharsInEnd);
     }
 
     // Ctrl + Backspace
-    if (e.code == 'Backspace' && e.ctrlKey) {
+    if (e.code == 'Backspace' && e.ctrlKey && typingInput.value.length != 0) {
       e.preventDefault();
 
       typingInput.value = '';
       currentCharIndex = prevInputLength = newInputLength = 0;
       currentChar = activeWord[currentCharIndex];
 
-      let wordStatistic =
-        test.statistic[
-          currentWordIndex == 0
-            ? activeWord
-            : typedWords.join(' ') + ' ' + activeWord
-        ];
+      let statisticKey =
+        currentWordIndex == 0
+          ? test.words[currentWordIndex]
+          : typedWords.join(' ') + ' ' + test.words[currentWordIndex];
+      let wordStatistic = test.statistic[statisticKey];
 
       wordStatistic.corrects.length = 0;
       wordStatistic.incorrects.length = 0;
@@ -305,6 +330,7 @@ function newTest() {
 
       startTime = Date.now();
       incorrectTypedCharsInEnd = 0;
+      removeChar(null, statisticKey, false, true);
     }
   };
 }
@@ -312,16 +338,19 @@ function newTest() {
 function finishTest(test, incorrectTypedChars) {
   console.log(test);
   const typingInput = document.querySelector('#typing-input');
+
   typingInput.oninput = null;
+  typingInput.onkeydown = null;
 
   let [totalMilliseconds, totalCharsCount] = Object.values(
     test.statistic,
   ).reduce(
-    ([sum, count], wordStatistic) => {
-      console.log(wordStatistic);
+    function ([sum, count], wordStatistic) {
       for (let key in wordStatistic.chars) {
-        sum += wordStatistic.chars[key];
-        count++;
+        if (wordStatistic.chars[key] != 0) {
+          sum += wordStatistic.chars[key];
+          count++;
+        }
       }
 
       return [sum, count];
@@ -330,8 +359,6 @@ function finishTest(test, incorrectTypedChars) {
   );
 
   let totalMinutes = totalMilliseconds / 1000 / 60;
-
-  console.log(totalMinutes);
 
   // # WPM
   let wpm = test.words.length / totalMinutes;
@@ -350,6 +377,117 @@ function abortTest() {
   console.log('Тест прерван');
   newTest();
 }
+
+//</Test>==============================================================================
+
+//<Visual Text>==============================================================================
+
+function addWord() {
+  const visualText = document.querySelector('#visual-text');
+  let word = document.createElement('span');
+  let visualActiveWord = visualText.querySelector('.active-word');
+
+  if (visualActiveWord) {
+    visualActiveWord.classList.remove('active-word');
+  }
+
+  word.classList.add('active-word');
+
+  visualText.append(word);
+}
+
+function removeWord() {
+  const visualText = document.querySelector('#visual-text');
+
+  // удаляем текущее активное слово
+  visualText.querySelector('.active-word').remove();
+
+  // получаем предыдущее
+  let previousWord = visualText.children[visualText.children.length - 1];
+
+  // делаем активным словом и удаляем последний символ - пробел
+  previousWord.classList.add('active-word');
+  previousWord.children[previousWord.children.length - 1].remove();
+}
+
+function addChar(
+  typedChar,
+  isCorrect,
+  charIndex,
+  wordKey,
+  incorrectInEnd = false,
+) {
+  const visualText = document.querySelector('#visual-text');
+  const passiveText = document.querySelector('#passive-text');
+
+  let visualActiveWord = visualText.querySelector('.active-word');
+  let char = document.createElement('span');
+
+  if (isCorrect) {
+    char.textContent = typedChar;
+    char.classList.add('correct-char');
+  } else {
+    char.classList.add('incorrect-char');
+    let passiveTextWord = passiveText.querySelector(`[data-key='${wordKey}']`);
+
+    if (!incorrectInEnd) {
+      let passiveTextWordValue = passiveTextWord.textContent;
+      let charValue = typedChar == ' ' ? '_' : typedChar;
+
+      char.textContent = charValue;
+      passiveTextWord.textContent =
+        passiveTextWordValue.slice(0, charIndex) +
+        charValue +
+        passiveTextWordValue.slice(charIndex + 1);
+    } else {
+      char.classList.add('incorrect-in-end');
+      char.textContent = typedChar;
+      passiveTextWord.textContent += typedChar;
+    }
+  }
+
+  visualActiveWord.append(char);
+}
+
+function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
+  const visualText = document.querySelector('#visual-text');
+  const passiveText = document.querySelector('#passive-text');
+
+  let visualActiveWord = visualText.querySelector('.active-word');
+  let passiveTextWord = passiveText.querySelector(`[data-key='${wordKey}']`);
+  let passiveTextWordValue = passiveTextWord.textContent;
+  let currentWord = wordKey.split(' ').at(-1);
+
+  // удалили только один символ
+  if (!all) {
+    // удаляем последний символ в активном слове
+    visualActiveWord.children[visualActiveWord.children.length - 1].remove();
+
+    // ошибка в пределах слова
+    if (!incorrectInEnd) {
+      // заменяем неверный символ в passiveTextWord на верный
+      passiveTextWord.textContent =
+        passiveTextWordValue.slice(0, charIndex) +
+        currentWord[charIndex] +
+        passiveTextWordValue.slice(charIndex + 1);
+    } else {
+      // ошибка в конце слова
+      passiveTextWord.textContent = passiveTextWordValue.slice(0, -1);
+    }
+  } else {
+    // удалили все символы
+
+    // возвращем изначальное слово в пассивный текст
+    passiveTextWord.textContent = currentWord;
+
+    // удаляем все символы из активного слова
+    for (const elem of Array.from(visualActiveWord.children)) {
+      elem.remove();
+    }
+  }
+}
+
+//</Visual Text>==============================================================================
 
 function settingsPanelInit(settingsJson) {
   const settingsLang = document.querySelector('#settings-lang');
@@ -553,15 +691,21 @@ function generateText(textsJson) {
 function initPassiveText(text) {
   const passiveText = document.querySelector('#passive-text');
   passiveText.innerHTML = '';
+  let wordKey = '';
 
   for (const word of text) {
+    wordKey += word;
+
     const span = document.createElement('span');
     span.textContent = word;
+    span.dataset.key = wordKey;
 
     const space = document.createElement('span');
     space.textContent = ' ';
 
     passiveText.append(space, span);
+
+    wordKey += ' ';
   }
 
   // первый пробел
