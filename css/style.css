@@ -72,15 +72,23 @@ body {
 
 /* </HEADER>============================================================================== */
 
+.main__body {
+  display: flex;
+  flex-direction: column;
+  row-gap: calc((60 / 16) * 1rem);
+}
+
 /* <SETTINGS>============================================================================== */
 
-.main__settings {
-  margin-bottom: calc((60 / 16) * 1rem);
-}
 .settings {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.1s ease-in, visibility 0.1s ease-in;
+}
+.settings._hidden {
+  opacity: 0;
+  visibility: hidden;
 }
 .settings__body {
   padding: 8px 12px;
@@ -232,3 +240,33 @@ body {
 }
 
 /* </TEXT>============================================================================== */
+
+/* <BUTTONS>============================================================================== */
+
+.btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc((60 / 16) * 1rem);
+}
+
+.btns__btn {
+  display: flex;
+  background-color: transparent;
+  font-size: 28px;
+  padding: 3px;
+
+  transition: opacity 0.1s ease-in, visibility 0.1s ease-in;
+}
+
+.btns__btn._hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.btns__btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--settings-panel-color);
+  border-radius: 3px;
+}
+
+/* </BUTTONS>============================================================================== */

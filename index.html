@@ -45,7 +45,7 @@
       <div class="main__container">
         <div class="main__body">
           <!-- Панель настроек -->
-          <form action="" class="main__settings settings">
+          <form action="" class="main__settings settings" id="settings-panel">
             <div class="settings__body">
               <div class="settings__block" id="settings-lang"></div>
               <div class="settings__block" id="settings-mode"></div>
@@ -64,6 +64,10 @@
               <p class="text__visual" id="visual-text" onmousedown="return false"></p>
               <span class="text__caret" id="typing-caret"></span>
             </div>
+          </div>
+          <!-- Кнопки -->
+          <div class="main__btns btns">
+            <button class="btns__btn _icon-repeat _hidden" id="btn-repeat"></button>
           </div>
         </div>
       </div>

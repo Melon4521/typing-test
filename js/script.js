@@ -35,6 +35,8 @@ main();
 //<Test>==============================================================================
 
 function newTest() {
+  focusTypingInput();
+
   let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
   const text = generateText(textsJson);
 
@@ -45,6 +47,15 @@ function newTest() {
     words: text,
     chars: [].concat(...text.map(word => word.split(''))),
     statistic: {},
+  };
+
+  const settingsPanel = document.querySelector('#settings-panel');
+  const btnRepeat = document.querySelector('#btn-repeat');
+
+  btnRepeat.onclick = e => {
+    console.log('Перезапуск теста');
+    clearTimeout(testAbortTimeoutId);
+    abortTest();
   };
 
   const typingInput = document.querySelector('#typing-input');
@@ -72,8 +83,8 @@ function newTest() {
 
   // Начинаем тест при вводе
   typingInput.oninput = function (e) {
+    // прерывание теста (typingInput больше 5 сек не в фокусе)
     if (typingInput.onblur == null) {
-      // прерывание теста (typingInput больше 5 сек не в фокусе)
       typingInput.onblur = () => {
         testAbortTimeoutId = setTimeout(() => {
           typingInput.onfocus = null;
@@ -87,6 +98,16 @@ function newTest() {
           }
         };
       };
+    }
+
+    // скрываем панель настроек
+    if (!settingsPanel.classList.contains('_hidden')) {
+      settingsPanelHide(true);
+    }
+
+    // показываем кнопку repeat
+    if (btnRepeat.classList.contains('_hidden')) {
+      btnRepeat.classList.remove('_hidden');
     }
 
     let statisticKey =
@@ -341,6 +362,8 @@ function finishTest(test, incorrectTypedChars) {
   typingInput.oninput = null;
   typingInput.onkeydown = null;
 
+  settingsPanelHide(false);
+
   let [totalMilliseconds, totalCharsCount] = Object.values(
     test.statistic,
   ).reduce(
@@ -376,6 +399,18 @@ let testAbortTimeoutId = null;
 
 function abortTest() {
   console.log('Тест прерван');
+
+  const btnRepeat = document.querySelector('#btn-repeat');
+
+  // показываем панель настроек
+  settingsPanelHide(false);
+
+  // скрываем кнопку repeat
+  if (!btnRepeat.classList.contains('_hidden')) {
+    btnRepeat.classList.add('_hidden');
+  }
+
+  // новый тест
   newTest();
 }
 
@@ -494,6 +529,7 @@ function settingsPanelInit(settingsJson) {
   const settingsLang = document.querySelector('#settings-lang');
   const settingsMode = document.querySelector('#settings-mode');
   const settingsValue = document.querySelector('#settings-value');
+  const settingsPanel = document.querySelector('#settings-panel');
 
   // отмена выделения текста
   settingsLang.onmousedown =
@@ -534,12 +570,13 @@ function settingsPanelInit(settingsJson) {
 
   // изменение языка
   langCheckbox.onchange = function () {
-    langCheckboxSpan.textContent = langCheckbox.value = langCheckbox.checked
-      ? settingsJson.lang.checkedValue
-      : settingsJson.lang.uncheckedValue;
-    localStorage.setItem('settings-lang', langCheckbox.value);
-    newTest();
-    focusTypingInput();
+    if (!settingsPanel.classList.contains('_hidden')) {
+      langCheckboxSpan.textContent = langCheckbox.value = langCheckbox.checked
+        ? settingsJson.lang.checkedValue
+        : settingsJson.lang.uncheckedValue;
+      localStorage.setItem('settings-lang', langCheckbox.value);
+      newTest();
+    }
   };
 
   //# MODE
@@ -567,10 +604,11 @@ function settingsPanelInit(settingsJson) {
 
   // делегируем изменение режима
   settingsMode.addEventListener('change', function (e) {
-    localStorage.setItem('settings-mode', e.target.value);
-    initSettingsValue(e.target.value);
-    newTest();
-    focusTypingInput();
+    if (!settingsPanel.classList.contains('_hidden')) {
+      localStorage.setItem('settings-mode', e.target.value);
+      initSettingsValue(e.target.value);
+      newTest();
+    }
   });
 
   // выбираем нужный режим
@@ -602,9 +640,10 @@ function settingsPanelInit(settingsJson) {
 
     // делегируем изменение значения
     settingsValue.addEventListener('change', function (e) {
-      localStorage.setItem('settings-value', e.target.value);
-      newTest();
-      focusTypingInput();
+      if (!settingsPanel.classList.contains('_hidden')) {
+        localStorage.setItem('settings-value', e.target.value);
+        newTest();
+      }
     });
 
     let activeRadio;
@@ -619,6 +658,16 @@ function settingsPanelInit(settingsJson) {
 
     activeRadio.checked = true;
     localStorage.setItem('settings-value', activeRadio.value);
+  }
+}
+
+function settingsPanelHide(hide) {
+  const settingsPanel = document.querySelector('#settings-panel');
+
+  if (hide) {
+    settingsPanel.classList.add('_hidden');
+  } else {
+    settingsPanel.classList.remove('_hidden');
   }
 }
 
