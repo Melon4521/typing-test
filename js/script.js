@@ -49,6 +49,7 @@ function newTest() {
     statistic: {},
   };
 
+  const typingCaret = document.querySelector('#typing-caret');
   const settingsPanel = document.querySelector('#settings-panel');
   const btnRepeat = document.querySelector('#btn-repeat');
 
@@ -84,7 +85,8 @@ function newTest() {
   // Начинаем тест при вводе
   typingInput.oninput = function (e) {
     // прерывание теста (typingInput больше 5 сек не в фокусе)
-    if (typingInput.onblur == null) {
+    // !!! Вернуть в продакшене
+    /* if (typingInput.onblur == null) {
       typingInput.onblur = () => {
         testAbortTimeoutId = setTimeout(() => {
           typingInput.onfocus = null;
@@ -98,7 +100,7 @@ function newTest() {
           }
         };
       };
-    }
+    } */
 
     // скрываем панель настроек
     if (!settingsPanel.classList.contains('_hidden')) {
@@ -108,6 +110,11 @@ function newTest() {
     // показываем кнопку repeat
     if (btnRepeat.classList.contains('_hidden')) {
       btnRepeat.classList.remove('_hidden');
+    }
+
+    // активируем каретку
+    if (!typingCaret.classList.contains('_active')) {
+      typingCaret.classList.add('_active');
     }
 
     let statisticKey =
@@ -419,6 +426,8 @@ function abortTest() {
 //<Visual Text>==============================================================================
 
 function addWord() {
+  const typingCaret = document.querySelector('#typing-caret');
+
   const visualText = document.querySelector('#visual-text');
   let word = document.createElement('span');
   let visualActiveWord = visualText.querySelector('.active-word');
@@ -429,10 +438,13 @@ function addWord() {
 
   word.classList.add('active-word');
 
+  word.prepend(typingCaret);
+
   visualText.append(word);
 }
 
 function removeWord() {
+  const typingCaret = document.querySelector('#typing-caret');
   const visualText = document.querySelector('#visual-text');
 
   // удаляем текущее активное слово
@@ -443,6 +455,7 @@ function removeWord() {
 
   // делаем активным словом и удаляем последний символ - пробел
   previousWord.classList.add('active-word');
+  previousWord.prepend(typingCaret);
   previousWord.children[previousWord.children.length - 1].remove();
 }
 
@@ -512,6 +525,7 @@ function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
     }
   } else {
     // удалили все символы
+    const typingCaret = document.querySelector('#typing-caret');
 
     // возвращем изначальное слово в пассивный текст
     passiveTextWord.textContent = currentWord;
@@ -520,6 +534,8 @@ function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
     for (const elem of Array.from(visualActiveWord.children)) {
       elem.remove();
     }
+
+    visualActiveWord.prepend(typingCaret);
   }
 }
 
