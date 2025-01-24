@@ -49,29 +49,11 @@ function newTest() {
 
   const typingInput = document.querySelector('#typing-input');
   typingInput.value = '';
-  // typingInput.onfocus = null;
 
-  // // прерывание теста через 5 сек при потере фокуса
-  // typingInput.onblur = function () {
-  //   let timerId = null;
+  const visualText = document.querySelector('#visual-text');
+  visualText.innerHTML = '';
 
-  //   Promise.race([
-  //     new Promise(resolve => {
-  //       timerId = setTimeout(() => {
-  //         abortTest();
-  //         typingInput.onblur = null;
-  //         resolve('Время вышло');
-  //       }, 5000);
-  //     }),
-  //     new Promise(resolve => {
-  //       typingInput.onfocus = function () {
-  //         clearTimeout(timerId);
-  //         typingInput.onfocus = null;
-  //         resolve('Тест продолжен');
-  //       };
-  //     }),
-  //   ]).then(res => console.log(res));
-  // };
+  typingInput.onblur = null;
 
   let typedWords = [];
   let currentWordIndex = 0;
@@ -90,6 +72,23 @@ function newTest() {
 
   // Начинаем тест при вводе
   typingInput.oninput = function (e) {
+    if (typingInput.onblur == null) {
+      // прерывание теста (typingInput больше 5 сек не в фокусе)
+      typingInput.onblur = () => {
+        testAbortTimeoutId = setTimeout(() => {
+          typingInput.onfocus = null;
+          abortTest();
+        }, 5000);
+
+        typingInput.onfocus = () => {
+          if (testAbortTimeoutId != null) {
+            clearTimeout(testAbortTimeoutId);
+            testAbortTimeoutId = null;
+          }
+        };
+      };
+    }
+
     let statisticKey =
       currentWordIndex == 0
         ? test.words[currentWordIndex]
@@ -372,6 +371,8 @@ function finishTest(test, incorrectTypedChars) {
 
   console.log('wpm: ' + wpm, 'cpm: ' + cpm, 'accurancy: ' + accurancy);
 }
+
+let testAbortTimeoutId = null;
 
 function abortTest() {
   console.log('Тест прерван');
@@ -756,6 +757,7 @@ function setFocusActionsOnTypingInput() {
       !e.ctrlKey
     ) {
       focusTypingInput();
+      e.preventDefault();
     }
   }
 }
