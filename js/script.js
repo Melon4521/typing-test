@@ -42,6 +42,8 @@ function newTest() {
 
   initPassiveText(text);
 
+  // const settingsMode = localStorage.getItem('settings-mode') || 'words';
+
   const test = {
     text: text.join(' '),
     words: text,
@@ -117,6 +119,10 @@ function newTest() {
       typingCaret.classList.add('_active');
     }
 
+    // if (settingsMode == 'time') {
+    //   let secondsCount = localStorage.getItem('settings-value') || 15;
+    // }
+
     let statisticKey =
       currentWordIndex == 0
         ? test.words[currentWordIndex]
@@ -137,6 +143,7 @@ function newTest() {
 
       if (currentWordIndex == 0) {
         startTime = Date.now();
+        // addWord(statisticKey);
         addWord();
       }
     }
@@ -222,6 +229,7 @@ function newTest() {
           activeWord = null;
           incorrectTypedCharsInEnd = 0;
           addChar(typedChar, true);
+          // addWord(typedWords.join(' ') + ' ' + test.words[currentWordIndex]);
           addWord();
         } else {
           if (incorrectTypedCharsInEnd <= 5) {
@@ -427,21 +435,42 @@ function abortTest() {
 
 function addWord() {
   const typingCaret = document.querySelector('#typing-caret');
-
   const visualText = document.querySelector('#visual-text');
-  let word = document.createElement('span');
+
   let visualActiveWord = visualText.querySelector('.active-word');
+  let word = document.createElement('span');
 
   if (visualActiveWord) {
     visualActiveWord.classList.remove('active-word');
   }
 
   word.classList.add('active-word');
-
   word.prepend(typingCaret);
 
   visualText.append(word);
 }
+
+/* 
+function addWord(wordKey) {
+  const typingCaret = document.querySelector('#typing-caret');
+  const visualText = document.querySelector('#visual-text');
+  const passiveText = document.querySelector('#passive-text');
+
+  let visualActiveWord = visualText.querySelector('.active-word');
+  let passiveTextWord = passiveText.querySelector(`[data-key='${wordKey}']`);
+  let word = document.createElement('span');
+
+  if (visualActiveWord) {
+    visualActiveWord.classList.remove('active-word');
+  }
+
+  word.style.minWidth = passiveTextWord.offsetWidth + 'px';
+  word.classList.add('active-word');
+  word.prepend(typingCaret);
+
+  visualText.append(word);
+}
+*/
 
 function removeWord() {
   const typingCaret = document.querySelector('#typing-caret');
@@ -455,8 +484,10 @@ function removeWord() {
 
   // делаем активным словом и удаляем последний символ - пробел
   previousWord.classList.add('active-word');
-  previousWord.prepend(typingCaret);
   previousWord.children[previousWord.children.length - 1].remove();
+
+  // добавляем каретку в начало
+  previousWord.prepend(typingCaret);
 }
 
 function addChar(
