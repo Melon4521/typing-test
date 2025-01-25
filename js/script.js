@@ -20,7 +20,7 @@ async function main() {
       throw new Error('Failed to fetch');
     }
 
-    setFocusActionsOnTypingInput();
+    // setFocusActionsOnTypingInput();
 
     newTest();
   } catch (err) {
@@ -37,12 +37,40 @@ main();
 function newTest() {
   focusTypingInput();
 
+  const typingInput = document.querySelector('#typing-input');
+  typingInput.value = '';
+  typingInput.onblur = null;
+
+  const visualText = document.querySelector('#visual-text');
+  visualText.innerHTML = '';
+
+  const settingsPanel = document.querySelector('#settings-panel');
+  const btnRepeat = document.querySelector('#btn-repeat');
+
+  btnRepeat.onclick = () => {
+    console.log('Перезапуск теста');
+    clearTimeout(testAbortTimeoutId);
+    abortTest();
+  };
+
+  // находим и удаляем старую каретку
+  const oldTypingCaret = document.querySelector('#typing-caret');
+
+  if (oldTypingCaret) oldTypingCaret.remove();
+
+  // создаем новую каретку и добавляем ее
+  const typingCaret = document.createElement('span');
+  typingCaret.classList.add('text__caret');
+  typingCaret.id = 'typing-caret';
+
+  document.querySelector('.text__body').append(typingCaret);
+
+  // генерируем текст
   let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
   const text = generateText(textsJson);
 
+  // создаем пассивный текст
   initPassiveText(text);
-
-  // const settingsMode = localStorage.getItem('settings-mode') || 'words';
 
   const test = {
     text: text.join(' '),
@@ -50,24 +78,6 @@ function newTest() {
     chars: [].concat(...text.map(word => word.split(''))),
     statistic: {},
   };
-
-  const typingCaret = document.querySelector('#typing-caret');
-  const settingsPanel = document.querySelector('#settings-panel');
-  const btnRepeat = document.querySelector('#btn-repeat');
-
-  btnRepeat.onclick = e => {
-    console.log('Перезапуск теста');
-    clearTimeout(testAbortTimeoutId);
-    abortTest();
-  };
-
-  const typingInput = document.querySelector('#typing-input');
-  typingInput.value = '';
-
-  const visualText = document.querySelector('#visual-text');
-  visualText.innerHTML = '';
-
-  typingInput.onblur = null;
 
   let typedWords = [];
   let currentWordIndex = 0;
@@ -119,9 +129,9 @@ function newTest() {
       typingCaret.classList.add('_active');
     }
 
-    // if (settingsMode == 'time') {
-    //   let secondsCount = localStorage.getItem('settings-value') || 15;
-    // }
+    if ((localStorage.getItem('settings-mode') || 'words') == 'time') {
+      let secondsCount = localStorage.getItem('settings-value') || 15;
+    }
 
     let statisticKey =
       currentWordIndex == 0
@@ -417,13 +427,12 @@ function abortTest() {
 
   const btnRepeat = document.querySelector('#btn-repeat');
 
-  // показываем панель настроек
-  settingsPanelHide(false);
-
   // скрываем кнопку repeat
   if (!btnRepeat.classList.contains('_hidden')) {
     btnRepeat.classList.add('_hidden');
   }
+  // показываем панель настроек
+  settingsPanelHide(false);
 
   // новый тест
   newTest();
