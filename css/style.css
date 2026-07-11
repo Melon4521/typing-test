@@ -165,9 +165,10 @@ body {
   display: inline-block;
   color: var(--text-color);
 }
-.text__visual > span {
+.text__visual > span > span {
   min-height: 1.65em;
   vertical-align: top;
+  white-space: pre;
 }
 .text__visual .correct-char {
   color: var(--text-color);
@@ -242,6 +243,7 @@ body {
 
 .text__caret._active {
   left: 100%;
+  animation: none;
 }
 
 @keyframes caret {

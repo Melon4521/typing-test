@@ -153,8 +153,8 @@ function newTest() {
 
       if (currentWordIndex == 0) {
         startTime = Date.now();
-        // addWord(statisticKey);
-        addWord();
+        addWord(statisticKey);
+        // addWord();
       }
     }
 
@@ -239,8 +239,8 @@ function newTest() {
           activeWord = null;
           incorrectTypedCharsInEnd = 0;
           addChar(typedChar, true);
-          // addWord(typedWords.join(' ') + ' ' + test.words[currentWordIndex]);
-          addWord();
+          addWord(typedWords.join(' ') + ' ' + test.words[currentWordIndex]);
+          // addWord();
         } else {
           if (incorrectTypedCharsInEnd <= 5) {
             incorrectTypedCharsInEnd++;
@@ -441,7 +441,7 @@ function abortTest() {
 //</Test>==============================================================================
 
 //<Visual Text>==============================================================================
-
+/* 
 function addWord() {
   const typingCaret = document.querySelector('#typing-caret');
   const visualText = document.querySelector('#visual-text');
@@ -458,28 +458,33 @@ function addWord() {
 
   visualText.append(word);
 }
+ */
 
-/* 
+// NOTE: Продолжить на том, чтобы подстроить остальные функции под wordContainer
+// NOTE: Подумать над тем, чтобы добавлять пробел внутрь passiveTextWord, а не после него отдельным спаном
+
 function addWord(wordKey) {
   const typingCaret = document.querySelector('#typing-caret');
   const visualText = document.querySelector('#visual-text');
+  const visualActiveWord = visualText.querySelector('.active-word');
   const passiveText = document.querySelector('#passive-text');
-
-  let visualActiveWord = visualText.querySelector('.active-word');
-  let passiveTextWord = passiveText.querySelector(`[data-key='${wordKey}']`);
-  let word = document.createElement('span');
+  const passiveTextWord = passiveText.querySelector(`[data-key='${wordKey}']`);
+  const word = document.createElement('span');
+  const wordContainer = document.createElement('span');
 
   if (visualActiveWord) {
     visualActiveWord.classList.remove('active-word');
   }
 
-  word.style.minWidth = passiveTextWord.offsetWidth + 'px';
+  wordContainer.style.display = 'inline-block';
+  wordContainer.style.minWidth = passiveTextWord.offsetWidth + 'px';
+  wordContainer.append(word);
+
   word.classList.add('active-word');
   word.prepend(typingCaret);
 
-  visualText.append(word);
+  visualText.append(wordContainer);
 }
-*/
 
 function removeWord() {
   const typingCaret = document.querySelector('#typing-caret');
