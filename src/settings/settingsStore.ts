@@ -11,7 +11,7 @@ import {
   type Mode,
   type TimeValue,
   type WordsValue,
-} from './types';
+} from '../core/types';
 
 const KEYS = {
   lang: 'settings-lang',
