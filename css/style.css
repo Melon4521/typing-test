@@ -84,14 +84,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.1s ease-in, visibility 0.1s ease-in;
+  transition:
+    opacity 0.1s ease-in,
+    visibility 0.1s ease-in;
 }
 .settings._hidden {
   opacity: 0;
   visibility: hidden;
 }
 .settings__body {
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 10px;
   background-color: var(--settings-panel);
 
@@ -99,10 +101,10 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  row-gap: 10px;
+  row-gap: 8px;
 }
 .settings__block {
-  padding: 0 20px;
+  padding: 0 16px;
   border-right: 3px solid var(--settings-panel-divider);
   font-weight: 500;
   color: var(--settings-panel-color);
@@ -145,21 +147,18 @@ body {
   letter-spacing: calc((1 / 16) * 1em);
   line-height: 1.65;
   color: var(--text-gray);
-}
-.text__passive {
+
   position: absolute;
   width: 100%;
   top: 0;
   left: 0;
+}
+.text__passive {
   z-index: 1;
 
   transition: top 0.2s ease-in;
 }
 .text__visual {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
   z-index: 2;
 
   display: inline-block;
@@ -191,7 +190,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 1rem;
 
   opacity: 0;
   visibility: hidden;
@@ -237,7 +236,9 @@ body {
   height: calc((35 / 16) * 1rem);
   background-color: var(--yellow);
   border-radius: 50px;
-  transition: left 0.2s ease-in, opacity 0.2s ease-in;
+  transition:
+    left 0.2s ease-in,
+    opacity 0.2s ease-in;
   animation: caret 0.7s ease-in-out infinite alternate-reverse;
 }
 
@@ -269,10 +270,12 @@ body {
 .btns__btn {
   display: flex;
   background-color: transparent;
-  font-size: 28px;
+  font-size: calc((28 / 16) * 1rem);
   padding: 3px;
 
-  transition: opacity 0.1s ease-in, visibility 0.1s ease-in;
+  transition:
+    opacity 0.1s ease-in,
+    visibility 0.1s ease-in;
 }
 
 .btns__btn._hidden {

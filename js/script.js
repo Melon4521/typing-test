@@ -20,7 +20,7 @@ async function main() {
       throw new Error('Failed to fetch');
     }
 
-    // setFocusActionsOnTypingInput();
+    setFocusActionsOnTypingInput();
 
     newTest();
   } catch (err) {
@@ -604,8 +604,8 @@ function settingsPanelInit(settingsJson) {
   let settingsLangValue = localStorage.getItem('settings-lang');
 
   if (settingsLangValue == null) {
-    localStorage.setItem('settings-lang', settingsJson.lang.checkedValue);
     settingsLangValue = settingsJson.lang.checkedValue;
+    localStorage.setItem('settings-lang', settingsLangValue);
   }
 
   settingsLang.insertAdjacentHTML(
@@ -663,6 +663,10 @@ function settingsPanelInit(settingsJson) {
     );
   }
 
+  // выбираем нужный режим
+  settingsMode.querySelector(`input[value='${settingsModeValue}']`).checked =
+    true;
+
   // делегируем изменение режима
   settingsMode.addEventListener('change', function (e) {
     if (!settingsPanel.classList.contains('_hidden')) {
@@ -671,11 +675,6 @@ function settingsPanelInit(settingsJson) {
       newTest();
     }
   });
-
-  // выбираем нужный режим
-  settingsMode.querySelector(
-    `input[value='${settingsModeValue}']`,
-  ).checked = true;
 
   //# VALUE
   initSettingsValue(
@@ -742,7 +741,7 @@ function generateText(textsJson) {
     wordsCount = 500;
   }
 
-  // готовый текст - вероятность 0,03 (шанс 3%)
+  // готовый текст - вероятность 0.03 (шанс 3%)
   if (Math.random() <= 0.03) {
     let text = textsJson[settingsLang].ready;
     return text[Math.floor(Math.random() * text.length)]
@@ -764,7 +763,7 @@ function generateText(textsJson) {
         nextCapital = false;
       }
 
-      // случайный знак препинания - вероятность 0,05 (шанс 5%)
+      // случайный знак препинания - вероятность 0.05 (шанс 5%)
       // note: возможно потом добавить регулирование кол-ва знаков препинания
       if (Math.random() <= 0.05) {
         let punctuation =
