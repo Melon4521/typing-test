@@ -100,3 +100,4 @@
 **Работа в feature/architecture**
 
 - Реализация модуля textGenerator.ts
+- Добавлен eslint

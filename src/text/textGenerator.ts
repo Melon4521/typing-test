@@ -16,16 +16,16 @@ export function generateText(textsCfg: TextsCfg) {
 
   // готовый текст - вероятность 0.03 (шанс 3%)
   if (Math.random() <= 0.03) {
-    let text = textsCfg[settingsLang].ready;
+    const text = textsCfg[settingsLang].ready;
     return text[Math.floor(Math.random() * text.length)]
       .split(' ')
       .slice(0, wordsCount);
   } else {
-    let randomWords = textsCfg[settingsLang].random;
-    let text: string[] = [];
+    const randomWords = textsCfg[settingsLang].random;
+    const text: string[] = [];
 
     let nextCapital = true;
-    let punctuations = ['.', ',', ';', ':', '!', '?', '"', '-'];
+    const punctuations = ['.', ',', ';', ':', '!', '?', '"', '-'];
 
     for (let i = 0; i < wordsCount; i++) {
       let word = randomWords[Math.floor(Math.random() * randomWords.length)];
@@ -39,7 +39,7 @@ export function generateText(textsCfg: TextsCfg) {
       // случайный знак препинания - вероятность 0.05 (шанс 5%)
       // note: возможно потом добавить регулирование кол-ва знаков препинания
       if (Math.random() <= 0.05) {
-        let punctuation =
+        const punctuation =
           punctuations[Math.floor(Math.random() * punctuations.length)];
 
         if (
