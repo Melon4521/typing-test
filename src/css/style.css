@@ -242,6 +242,11 @@ body {
   animation: caret 0.7s ease-in-out infinite alternate-reverse;
 }
 
+.text__caret._hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .text__caret._active {
   left: 100%;
   animation: none;
