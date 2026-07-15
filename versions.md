@@ -94,3 +94,9 @@
 - Модуль settings/settingsStore - единый интерфейс для записи в LocalStorage
 - Вынос общих типов, связанных с Тестом, в core/types.ts
 - Уход от json-хранилища к конфигам для настроек (settingsConfig.ts) и текста (textsConfig.ts)
+
+#### 15/07/26:
+
+**Работа в feature/architecture**
+
+- Реализация модуля textGenerator.ts

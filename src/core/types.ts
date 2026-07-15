@@ -36,3 +36,5 @@ export function isTimeValue(value: unknown): value is TimeValue {
     (TIME_VALUES as readonly number[]).includes(value)
   );
 }
+
+export type AllowedWordsCount = WordsValue | 500;

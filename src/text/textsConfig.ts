@@ -1,6 +1,6 @@
 import type { Lang } from '../core/types';
 
-type TextsCfg = Record<
+export type TextsCfg = Record<
   Lang,
   {
     ready: readonly string[];
