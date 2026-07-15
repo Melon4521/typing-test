@@ -27,26 +27,28 @@ type SettingsCfg = {
   time: SettingsMode<TimeValue>;
 };
 
-export const settingsCfg: SettingsCfg = {
-  lang: {
-    icon: '_icon-globe',
-    type: 'checkbox',
+export function getSettingsCfg(): SettingsCfg {
+  return {
+    lang: {
+      icon: '_icon-globe',
+      type: 'checkbox',
 
-    checkedValue: 'ru',
-    uncheckedValue: 'en',
-  },
-  time: {
-    icon: '_icon-timer',
-    type: 'radio',
+      checkedValue: 'ru',
+      uncheckedValue: 'en',
+    },
+    time: {
+      icon: '_icon-timer',
+      type: 'radio',
 
-    title: 'время',
-    values: TIME_VALUES,
-  },
-  words: {
-    icon: '_icon-letter',
-    type: 'radio',
+      title: 'время',
+      values: TIME_VALUES,
+    },
+    words: {
+      icon: '_icon-letter',
+      type: 'radio',
 
-    title: 'слова',
-    values: WORDS_VALUES,
-  },
-};
+      title: 'слова',
+      values: WORDS_VALUES,
+    },
+  };
+}
