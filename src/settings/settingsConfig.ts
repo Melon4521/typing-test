@@ -21,7 +21,7 @@ interface SettingsMode<T extends number> extends SettingsBase {
   values: readonly T[];
 }
 
-type SettingsCfg = {
+export type SettingsCfg = {
   lang: SettingsLang;
   words: SettingsMode<WordsValue>;
   time: SettingsMode<TimeValue>;
