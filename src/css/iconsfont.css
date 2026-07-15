@@ -1,11 +1,12 @@
 @font-face {
   font-family: 'iconsfont';
-  src: url('../src/iconsfont/iconsfont.eot?gz80qz');
-  src: url('../src/iconsfont/iconsfont.eot?gz80qz#iefix')
+  src: url('/src/assets/iconsfont/iconsfont.eot?gz80qz');
+  src:
+    url('/src/assets/iconsfont/iconsfont.eot?gz80qz#iefix')
       format('embedded-opentype'),
-    url('../src/iconsfont/iconsfont.ttf?gz80qz') format('truetype'),
-    url('../src/iconsfont/iconsfont.woff?gz80qz') format('woff'),
-    url('../src/iconsfont/iconsfont.svg?gz80qz#iconsfont') format('svg');
+    url('/src/assets/iconsfont/iconsfont.ttf?gz80qz') format('truetype'),
+    url('/src/assets/iconsfont/iconsfont.woff?gz80qz') format('woff'),
+    url('/src/assets/iconsfont/iconsfont.svg?gz80qz#iconsfont') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
