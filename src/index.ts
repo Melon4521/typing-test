@@ -1,4 +1,5 @@
 import { getElements } from './render/dom';
+import { renderTest } from './render/render';
 import { getSettingsCfg } from './settings/settingsConfig';
 import {
   attachSettingsValueChangeListener,
@@ -7,19 +8,22 @@ import {
   initSettingsValue,
 } from './settings/settingsPanel';
 import { initSettings, settingsStore } from './settings/settingsStore';
-// import { getTextsCfg } from './text/textsConfig';
+import { getTextsCfg } from './text/textsConfig';
 
 function main() {
-  initSettings();
-
   const els = getElements();
-  // const textsCfg = getTextsCfg();
+  const textsCfg = getTextsCfg();
   const settingsCfg = getSettingsCfg();
 
+  // панель настроек
+  initSettings();
   initSettingsLang(els, settingsCfg);
   initSettingsMode(els, settingsCfg);
   initSettingsValue(settingsStore.getMode(), els, settingsCfg);
   attachSettingsValueChangeListener(els);
+
+  // тест
+  renderTest(els, textsCfg);
 }
 
 main();
