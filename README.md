@@ -1,12 +1,12 @@
 # Typing Test App
 
-Web-application for training your typing speed, inspired by **Monkeytype**
+Web-application for practicing your typing speed, inspired by **Monkeytype**
 
 ![screenshot](docs/screenshot.png)
 
 ## Branches
 
-- `main` – current version, only frontend version of app written in vanilla TypeScript
+- `main` – current version, frontend-only version of app written in vanilla TypeScript
 - `react-go-rewrite` – planning: full-stack application rewritten on React (client) and Go (server)
 
 ## Tech Stack
@@ -20,7 +20,7 @@ Web-application for training your typing speed, inspired by **Monkeytype**
 ## Features
 
 - Configurable settings (words / time / language)
-- Calculating WPM, CPM and accuracy after test pass
+- Calculating WPM, CPM and accuracy after the test is finished
 - Saving settings in LocalStorage
 
 ## Getting Started
