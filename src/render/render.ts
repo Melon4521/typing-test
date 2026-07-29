@@ -10,6 +10,12 @@ export function renderTest(els: Elements, textsCfg: TextsCfg) {
   els.typingInput.focus();
 }
 
+/**
+ * Attaches focus and blur listeners to `typingInput` before the test starts.
+ *
+ * Allows clicking the `textPlaceholder` element or pressing any key
+ * to focus `typingInput`.
+ */
 export function setFocusActionsOnTypingInput(els: Elements) {
   els.typingInput.focus();
 
