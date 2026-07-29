@@ -20,7 +20,7 @@ export function generateText(textsCfg: TextsCfg) {
     wordsCount = settingsStore.getValue(settingsMode);
   }
 
-  // готовый текст - вероятность 0.03 (шанс 3%)
+  // ready-made text with a 0.03 probability (3% chance)
   if (Math.random() <= 0.03) {
     const text = textsCfg[settingsLang].ready;
     return text[Math.floor(Math.random() * text.length)]
@@ -36,13 +36,13 @@ export function generateText(textsCfg: TextsCfg) {
     for (let i = 0; i < wordsCount; i++) {
       let word = randomWords[Math.floor(Math.random() * randomWords.length)];
 
-      // если первая буква должна быть заглавной
+      // if the first letter should be capitalized
       if (nextCapital) {
         word = word[0].toUpperCase() + word.slice(1, word.length);
         nextCapital = false;
       }
 
-      // случайный знак препинания - вероятность 0.05 (шанс 5%)
+      // random punctuation with a 0.05 probability (5% chance)
       if (Math.random() <= 0.05) {
         const punctuation =
           punctuations[Math.floor(Math.random() * punctuations.length)];

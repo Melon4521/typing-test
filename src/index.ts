@@ -18,7 +18,7 @@ function main() {
   const textsCfg = getTextsCfg();
   const settingsCfg = getSettingsCfg();
 
-  // панель настроек
+  // settings panel
   initSettings();
   initSettingsLang(els, settingsCfg);
   initSettingsMode(els, settingsCfg);
@@ -27,7 +27,7 @@ function main() {
 
   setFocusActionsOnTypingInput(els);
 
-  // тест
+  // test
   renderTest(els, textsCfg);
 }
 

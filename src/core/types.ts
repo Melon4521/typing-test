@@ -28,7 +28,7 @@ export function isMode(value: unknown): value is Mode {
   );
 }
 
-// NOTE: В проде поменять на 25 | 50 | 75 | 100
+// NOTE: In production, change this to 25 | 50 | 75 | 100
 export const WORDS_VALUES = [5, 25, 75, 100] as const;
 export type WordsValue = (typeof WORDS_VALUES)[number];
 

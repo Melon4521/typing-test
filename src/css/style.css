@@ -1,4 +1,4 @@
-/* Светлая тема */
+/* Light theme */
 :root {
   --bg-color-l: 100%;
 
@@ -15,7 +15,7 @@
   --yellow: hsl(47, 86%, 55%);
 }
 
-/* Темная тема */
+/* Dark theme */
 :root[data-theme='dark'] {
   color-scheme: dark;
 
@@ -34,7 +34,7 @@ body {
   color: var(--text-color);
 }
 
-/* Прижатие футера */
+/* Footer sticking */
 .wrapper {
   padding-top: calc((30 / 16) * 1rem);
   min-height: 100%;

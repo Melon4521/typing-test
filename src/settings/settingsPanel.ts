@@ -28,7 +28,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
   const checkedLangValue = settingsCfg.lang.checkedValue;
   const uncheckedLangValue = settingsCfg.lang.uncheckedValue;
 
-  // отмена выделения текста
+  // prevent text selection
   els.settingsLang.onmousedown = () => {
     return false;
   };
@@ -58,7 +58,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
     ? checkedLangValue
     : uncheckedLangValue;
 
-  // изменение языка
+  // language change
   langCheckbox.addEventListener('change', function () {
     if (!isHidden(els.settingsPanel)) {
       const pickedLang = langCheckbox.checked
@@ -68,7 +68,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
       langCheckboxSpan.textContent = langCheckbox.value = pickedLang;
       settingsStore.setLang(pickedLang);
 
-      // TODO: Вызов нового теста
+      // TODO: A new test call
       // newTest();
     }
   });
@@ -81,7 +81,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
  * @param settingsCfg - The settings configuration for mode options.
  */
 export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
-  // отмена выделения текста
+  // prevent text selection
   els.settingsMode.onmousedown = () => {
     return false;
   };
@@ -102,13 +102,13 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
     );
   }
 
-  // выбираем нужный режим
+  // select the appropriate mode
   const modeFirstRadio = els.settingsMode.querySelector(
     `input[value='${mode}']`,
   ) as HTMLInputElement;
   modeFirstRadio.checked = true;
 
-  // делегируем изменение режима
+  // delegate mode changes
   els.settingsMode.addEventListener('change', function (e) {
     if (
       !isHidden(els.settingsPanel) &&
@@ -120,7 +120,7 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
 
       initSettingsValue(els, settingsCfg);
 
-      // TODO: Вызов нового теста
+      // TODO: A new test call
       // newTest();
     }
   });
@@ -133,7 +133,7 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
  * @param settingsCfg - The settings configuration for available values.
  */
 export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
-  // отмена выделения текста
+  // prevent text selection
   els.settingsValue.onmousedown = () => {
     return false;
   };
@@ -170,7 +170,7 @@ export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
  * @param els - The DOM elements used by the settings panel.
  */
 export function attachSettingsValueChangeListener(els: Elements) {
-  // делегируем изменение значения
+  // delegate value changes
   els.settingsValue.addEventListener('change', function (e) {
     if (
       !isHidden(els.settingsPanel) &&
@@ -183,7 +183,7 @@ export function attachSettingsValueChangeListener(els: Elements) {
         settingsStore.setTimeValue(Number(e.target.value) as TimeValue);
       }
 
-      // TODO: Вызов нового теста
+      // TODO: A new test call
       // newTest();
     }
   });

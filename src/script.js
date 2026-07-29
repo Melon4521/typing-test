@@ -1,6 +1,6 @@
 async function main() {
   try {
-    // получаем json настроек
+    // get the settings JSON
     const settingsResponse = await fetch('api/settings.json');
 
     if (settingsResponse.ok) {
@@ -10,7 +10,7 @@ async function main() {
       throw new Error('Failed to fetch');
     }
 
-    // получаем и сохраняем json текстов
+    // get and save the text JSON
     const textsResponse = await fetch('api/texts.json');
 
     if (textsResponse.ok) {
@@ -35,7 +35,7 @@ main();
 //<Test>==============================================================================
 
 function newTest() {
-  focusTypingInput(); // DONE: код перенесен
+  focusTypingInput(); // DONE: code moved
 
   const typingInput = document.querySelector('#typing-input');
   typingInput.value = '';
@@ -53,23 +53,23 @@ function newTest() {
     abortTest();
   };
 
-  // находим и удаляем старую каретку
+  // find and remove the old caret
   const oldTypingCaret = document.querySelector('#typing-caret');
 
   if (oldTypingCaret) oldTypingCaret.remove();
 
-  // создаем новую каретку и добавляем ее
+  // create a new caret and append it
   const typingCaret = document.createElement('span');
   typingCaret.classList.add('text__caret');
   typingCaret.id = 'typing-caret';
 
   document.querySelector('.text__body').append(typingCaret);
 
-  // генерируем текст
+  // generate text
   let textsJson = JSON.parse(sessionStorage.getItem('texts-json'));
   const text = generateText(textsJson);
 
-  // создаем пассивный текст
+  // create passive text
   initPassiveText(text);
 
   const test = {
@@ -94,10 +94,10 @@ function newTest() {
   let startTime = 0;
   let endTime = 0;
 
-  // Начинаем тест при вводе
+  // start the test on input
   typingInput.oninput = function (e) {
-    // прерывание теста (typingInput больше 5 сек не в фокусе)
-    // !!! Вернуть в продакшене
+    // interrupt the test when typingInput has been out of focus for more than 5 seconds
+    // !!! Restore in production
     /* if (typingInput.onblur == null) {
       typingInput.onblur = () => {
         testAbortTimeoutId = setTimeout(() => {
@@ -114,17 +114,17 @@ function newTest() {
       };
     } */
 
-    // скрываем панель настроек
+    // hide the settings panel
     if (!settingsPanel.classList.contains('_hidden')) {
       settingsPanelHide(true);
     }
 
-    // показываем кнопку repeat
+    // show the repeat button
     if (btnRepeat.classList.contains('_hidden')) {
       btnRepeat.classList.remove('_hidden');
     }
 
-    // активируем каретку
+    // activate the caret
     if (!typingCaret.classList.contains('_active')) {
       typingCaret.classList.add('_active');
     }
@@ -163,16 +163,16 @@ function newTest() {
     let wordStatistic = test.statistic[statisticKey];
     let typedChar = typingInput.value.at(-1);
 
-    // # длина увеличилась - символ ввели
+    // # length increased - a character was entered
     if (newInputLength - prevInputLength > 0) {
-      // еще не дошли до конца слова
+      // not yet at the end of the word
       if (currentChar !== undefined) {
         endTime = Date.now();
 
         let wordState = activeWord.slice(0, currentCharIndex + 1);
         let isCorrect;
 
-        // набран верный символ
+        // correct character typed
         if (typedChar === currentChar) {
           isCorrect = true;
           wordStatistic.corrects.push(wordState);
@@ -184,7 +184,7 @@ function newTest() {
             wordStatistic.chars[wordState] = endTime - startTime;
           }
         } else {
-          // набран неверный символ
+          // incorrect character typed
           isCorrect = false;
           wordStatistic.incorrects.push(wordState);
 
@@ -206,9 +206,9 @@ function newTest() {
         prevInputLength = newInputLength;
       } else {
         console.log('До:', incorrectTypedCharsInEnd);
-        // конец слова - ожидается пробел
+        // end of the word - a space is expected
         if (typedChar === ' ') {
-          // NOTE: endTime = Date.now(); <<< ПРОДУМАТЬ ЭТО ПОЗЖЕ
+          // NOTE: endTime = Date.now(); <<< think about this later
           if (lastIncorrectWord !== null) {
             let prevWordStatistic = test.statistic[typedWords.join(' ')];
 
@@ -255,7 +255,7 @@ function newTest() {
         console.log('После:', incorrectTypedCharsInEnd);
       }
 
-      // # конец теста
+      // # end of the test
       if (
         currentWordIndex == test.words.length - 1 &&
         currentCharIndex == test.words.at(-1).length &&
@@ -280,7 +280,7 @@ function newTest() {
         finishTest(test, incorrectTypedChars);
       }
     } else {
-      // # длина уменьшилась - символ удалили
+      // # length decreased - a character was deleted
       if (currentCharIndex <= activeWord.length) {
         let previousWordState = activeWord.slice(0, currentCharIndex);
 
@@ -316,7 +316,7 @@ function newTest() {
   };
 
   typingInput.onkeydown = e => {
-    // нажаты стрелки/delete - игнорируем
+    // arrow/delete keys were pressed - ignore them
     if (
       ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete'].includes(
         e.code,
@@ -325,7 +325,7 @@ function newTest() {
       e.preventDefault();
     }
 
-    // переход к предыдущему слову
+    // move to the previous word
     if (
       e.code == 'Backspace' &&
       !e.ctrlKey &&
@@ -427,14 +427,14 @@ function abortTest() {
 
   const btnRepeat = document.querySelector('#btn-repeat');
 
-  // скрываем кнопку repeat
+  // hide the repeat button
   if (!btnRepeat.classList.contains('_hidden')) {
     btnRepeat.classList.add('_hidden');
   }
-  // показываем панель настроек
+  // show the settings panel
   settingsPanelHide(false);
 
-  // новый тест
+  // new test
   newTest();
 }
 
@@ -460,8 +460,8 @@ function addWord() {
 }
  */
 
-// NOTE: Продолжить на том, чтобы подстроить остальные функции под wordContainer
-// NOTE: Подумать над тем, чтобы добавлять пробел внутрь passiveTextWord, а не после него отдельным спаном
+// NOTE: Continue by adapting the remaining functions to the wordContainer
+// NOTE: Consider adding the space inside passiveTextWord rather than as a separate span after it
 
 function addWord(wordKey) {
   const typingCaret = document.querySelector('#typing-caret');
@@ -490,17 +490,17 @@ function removeWord() {
   const typingCaret = document.querySelector('#typing-caret');
   const visualText = document.querySelector('#visual-text');
 
-  // удаляем текущее активное слово
+  // remove the current active word
   visualText.querySelector('.active-word').remove();
 
-  // получаем предыдущее
+  // get the previous one
   let previousWord = visualText.children[visualText.children.length - 1];
 
-  // делаем активным словом и удаляем последний символ - пробел
+  // make it the active word and remove the last character - the space
   previousWord.classList.add('active-word');
   previousWord.children[previousWord.children.length - 1].remove();
 
-  // добавляем каретку в начало
+  // add the caret to the beginning
   previousWord.prepend(typingCaret);
 }
 
@@ -552,30 +552,30 @@ function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
   let passiveTextWordValue = passiveTextWord.textContent;
   let currentWord = wordKey.split(' ').at(-1);
 
-  // удалили только один символ
+  // only one character was deleted
   if (!all) {
-    // удаляем последний символ в активном слове
+    // remove the last character from the active word
     visualActiveWord.children[visualActiveWord.children.length - 1].remove();
 
-    // ошибка в пределах слова
+    // error within the word
     if (!incorrectInEnd) {
-      // заменяем неверный символ в passiveTextWord на верный
+      // replace the incorrect character in passiveTextWord with the correct one
       passiveTextWord.textContent =
         passiveTextWordValue.slice(0, charIndex) +
         currentWord[charIndex] +
         passiveTextWordValue.slice(charIndex + 1);
     } else {
-      // ошибка в конце слова
+      // error at the end of the word
       passiveTextWord.textContent = passiveTextWordValue.slice(0, -1);
     }
   } else {
-    // удалили все символы
+    // all characters were deleted
     const typingCaret = document.querySelector('#typing-caret');
 
-    // возвращем изначальное слово в пассивный текст
+    // restore the original word to the passive text
     passiveTextWord.textContent = currentWord;
 
-    // удаляем все символы из активного слова
+    // remove all characters from the active word
     for (const elem of Array.from(visualActiveWord.children)) {
       elem.remove();
     }
@@ -586,14 +586,14 @@ function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
 
 //</Visual Text>==============================================================================
 
-// DONE: код перенесен
+// DONE: code moved
 function settingsPanelInit(settingsJson) {
   const settingsLang = document.querySelector('#settings-lang');
   const settingsMode = document.querySelector('#settings-mode');
   const settingsValue = document.querySelector('#settings-value');
   const settingsPanel = document.querySelector('#settings-panel');
 
-  // отмена выделения текста
+  // prevent text selection
   settingsLang.onmousedown =
     settingsMode.onmousedown =
     settingsValue.onmousedown =
@@ -630,7 +630,7 @@ function settingsPanelInit(settingsJson) {
     ? settingsJson.lang.checkedValue
     : settingsJson.lang.uncheckedValue;
 
-  // изменение языка
+  // language change
   langCheckbox.onchange = function () {
     if (!settingsPanel.classList.contains('_hidden')) {
       langCheckboxSpan.textContent = langCheckbox.value = langCheckbox.checked
@@ -664,11 +664,11 @@ function settingsPanelInit(settingsJson) {
     );
   }
 
-  // выбираем нужный режим
+  // select the appropriate mode
   settingsMode.querySelector(`input[value='${settingsModeValue}']`).checked =
     true;
 
-  // делегируем изменение режима
+  // delegate mode changes
   settingsMode.addEventListener('change', function (e) {
     if (!settingsPanel.classList.contains('_hidden')) {
       localStorage.setItem('settings-mode', e.target.value);
@@ -699,7 +699,7 @@ function settingsPanelInit(settingsJson) {
       );
     }
 
-    // делегируем изменение значения
+    // delegate value changes
     settingsValue.addEventListener('change', function (e) {
       if (!settingsPanel.classList.contains('_hidden')) {
         localStorage.setItem('settings-value', e.target.value);
@@ -722,7 +722,7 @@ function settingsPanelInit(settingsJson) {
   }
 }
 
-// DONE: код перенесен
+// DONE: code moved
 function settingsPanelHide(hide) {
   const settingsPanel = document.querySelector('#settings-panel');
 
@@ -733,7 +733,7 @@ function settingsPanelHide(hide) {
   }
 }
 
-// DONE: код перенесен
+// DONE: code moved
 function generateText(textsJson) {
   const settingsMode = localStorage.getItem('settings-mode') || 'words';
   const settingsLang = localStorage.getItem('settings-lang') || 'ru';
@@ -744,7 +744,7 @@ function generateText(textsJson) {
     wordsCount = 500;
   }
 
-  // готовый текст - вероятность 0.03 (шанс 3%)
+  // ready-made text with a 0.03 probability (3% chance)
   if (Math.random() <= 0.03) {
     let text = textsJson[settingsLang].ready;
     return text[Math.floor(Math.random() * text.length)]
@@ -760,14 +760,14 @@ function generateText(textsJson) {
     for (let i = 0; i < wordsCount; i++) {
       let word = randomWords[Math.floor(Math.random() * randomWords.length)];
 
-      // если первая буква должна быть заглавной
+      // if the first letter should be capitalized
       if (nextCapital) {
         word = word[0].toUpperCase() + word.slice(1, word.length);
         nextCapital = false;
       }
 
-      // случайный знак препинания - вероятность 0.05 (шанс 5%)
-      // note: возможно потом добавить регулирование кол-ва знаков препинания
+      // random punctuation with a 0.05 probability (5% chance)
+      // note: we may add punctuation count control later
       if (Math.random() <= 0.05) {
         let punctuation =
           punctuations[Math.floor(Math.random() * punctuations.length)];
@@ -801,7 +801,7 @@ function generateText(textsJson) {
   }
 }
 
-// DONE: код перенесен
+// DONE: code moved
 function initPassiveText(text) {
   const passiveText = document.querySelector('#passive-text');
   passiveText.innerHTML = '';
@@ -822,11 +822,11 @@ function initPassiveText(text) {
     wordKey += ' ';
   }
 
-  // первый пробел
+  // first space
   passiveText.children[0].remove();
 }
 
-// DONE: код перенесен
+// DONE: code moved
 function setFocusActionsOnTypingInput() {
   const typingInput = document.querySelector('#typing-input');
   const placeholder = document.querySelector('.text__placeholder');
@@ -876,7 +876,7 @@ function setFocusActionsOnTypingInput() {
   }
 }
 
-// DONE: код перенесен
+// DONE: code moved
 function focusTypingInput() {
   const typingInput = document.querySelector('#typing-input');
   typingInput.focus();
