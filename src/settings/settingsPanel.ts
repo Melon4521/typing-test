@@ -100,7 +100,7 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
       const pickedMode = e.target.value as Mode;
       settingsStore.setMode(pickedMode);
 
-      initSettingsValue(pickedMode, els, settingsCfg);
+      initSettingsValue(els, settingsCfg);
 
       // TODO: Вызов нового теста
       // newTest();
@@ -108,16 +108,13 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
   });
 }
 
-export function initSettingsValue(
-  mode: Mode,
-  els: Elements,
-  settingsCfg: SettingsCfg,
-) {
+export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
   // отмена выделения текста
   els.settingsValue.onmousedown = () => {
     return false;
   };
 
+  const mode = settingsStore.getMode();
   const values = settingsCfg[mode].values;
 
   els.settingsValue.innerHTML = '';

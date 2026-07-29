@@ -7,7 +7,7 @@ import {
   initSettingsMode,
   initSettingsValue,
 } from './settings/settingsPanel';
-import { initSettings, settingsStore } from './settings/settingsStore';
+import { initSettings } from './settings/settingsStore';
 import { getTextsCfg } from './text/textsConfig';
 
 function main() {
@@ -19,7 +19,7 @@ function main() {
   initSettings();
   initSettingsLang(els, settingsCfg);
   initSettingsMode(els, settingsCfg);
-  initSettingsValue(settingsStore.getMode(), els, settingsCfg);
+  initSettingsValue(els, settingsCfg);
   attachSettingsValueChangeListener(els);
 
   // тест
