@@ -8,10 +8,22 @@ import type { Elements } from '../render/dom';
 import type { SettingsCfg } from './settingsConfig';
 import { settingsStore } from './settingsStore';
 
+/**
+ * Checks whether a settings container is hidden.
+ *
+ * @param container - The container element to inspect.
+ * @returns True when the container has the `_hidden` CSS class.
+ */
 function isHidden(container: HTMLElement) {
   return container.classList.contains('_hidden');
 }
 
+/**
+ * Initializes the language setting UI and binds its change handler.
+ *
+ * @param els - The DOM elements used by the settings panel.
+ * @param settingsCfg - The settings configuration for language options.
+ */
 export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
   const checkedLangValue = settingsCfg.lang.checkedValue;
   const uncheckedLangValue = settingsCfg.lang.uncheckedValue;
@@ -62,6 +74,12 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
   });
 }
 
+/**
+ * Initializes the mode setting UI and binds its change handler.
+ *
+ * @param els - The DOM elements used by the settings panel.
+ * @param settingsCfg - The settings configuration for mode options.
+ */
 export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
   // отмена выделения текста
   els.settingsMode.onmousedown = () => {
@@ -108,6 +126,12 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
   });
 }
 
+/**
+ * Initializes the value selection UI for the currently active mode.
+ *
+ * @param els - The DOM elements used by the settings panel.
+ * @param settingsCfg - The settings configuration for available values.
+ */
 export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
   // отмена выделения текста
   els.settingsValue.onmousedown = () => {
@@ -140,6 +164,11 @@ export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
   activeRadio.checked = true;
 }
 
+/**
+ * Attaches a change listener for the value selection UI.
+ *
+ * @param els - The DOM elements used by the settings panel.
+ */
 export function attachSettingsValueChangeListener(els: Elements) {
   // делегируем изменение значения
   els.settingsValue.addEventListener('change', function (e) {
@@ -160,6 +189,12 @@ export function attachSettingsValueChangeListener(els: Elements) {
   });
 }
 
+/**
+ * Shows or hides the settings panel.
+ *
+ * @param panel - The settings panel element.
+ * @param hide - Whether the panel should be hidden.
+ */
 export function settingsPanelHide(panel: HTMLFormElement, hide: boolean) {
   if (hide) {
     panel.classList.add('_hidden');

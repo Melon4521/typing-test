@@ -2,6 +2,12 @@ import type { AllowedWordsCount } from '../core/types';
 import { settingsStore } from '../settings/settingsStore';
 import type { TextsCfg } from './textsConfig';
 
+/**
+ * Generates a random typing text based on the current settings.
+ *
+ * @param textsCfg - The text configuration for both ready-made and random text variants.
+ * @returns An array of words that forms the typing test content.
+ */
 export function generateText(textsCfg: TextsCfg) {
   const settingsMode = settingsStore.getMode();
   const settingsLang = settingsStore.getLang();
@@ -37,7 +43,6 @@ export function generateText(textsCfg: TextsCfg) {
       }
 
       // случайный знак препинания - вероятность 0.05 (шанс 5%)
-      // note: возможно потом добавить регулирование кол-ва знаков препинания
       if (Math.random() <= 0.05) {
         const punctuation =
           punctuations[Math.floor(Math.random() * punctuations.length)];

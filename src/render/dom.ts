@@ -1,3 +1,6 @@
+/**
+ * Represents the main DOM elements used by the typing test and settings UI.
+ */
 export interface Elements {
   textPlaceholder: HTMLElement;
   typingInput: HTMLInputElement;
@@ -13,6 +16,11 @@ export interface Elements {
   btnRepeat: HTMLButtonElement;
 }
 
+/**
+ * Collects the required DOM elements from the document.
+ *
+ * @returns The typed element map for the app.
+ */
 export function getElements(): Elements {
   return {
     textPlaceholder: document.querySelector('.text__placeholder')!,

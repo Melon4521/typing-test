@@ -36,6 +36,12 @@ export interface SettingsStore {
   ensureValueForMode(mode: Mode): WordsValue | TimeValue;
 }
 
+/**
+ * Gets the stored value for the current or specified mode.
+ *
+ * @param mode - The mode for which the value should be resolved.
+ * @returns The validated value for the selected mode.
+ */
 function getValue(mode: 'words'): WordsValue;
 function getValue(mode: 'time'): TimeValue;
 function getValue(mode?: Mode): WordsValue | TimeValue;
@@ -101,6 +107,9 @@ export const settingsStore: SettingsStore = {
   },
 };
 
+/**
+ * Initializes the settings storage with defaults when needed.
+ */
 export function initSettings() {
   if (!isLang(localStorage.getItem(KEYS.lang))) {
     settingsStore.setLang(LANGS[0]);

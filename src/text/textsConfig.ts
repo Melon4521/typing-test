@@ -1,5 +1,8 @@
 import type { Lang } from '../core/types';
 
+/**
+ * Describes the available text content for each supported language.
+ */
 export type TextsCfg = Record<
   Lang,
   {
@@ -8,6 +11,11 @@ export type TextsCfg = Record<
   }
 >;
 
+/**
+ * Creates the text configuration for the application.
+ *
+ * @returns The text sets for Russian and English content.
+ */
 export function getTextsCfg(): TextsCfg {
   return {
     ru: {

@@ -2,6 +2,12 @@ import { generateText } from '../text/textGenerator';
 import type { TextsCfg } from '../text/textsConfig';
 import type { Elements } from './dom';
 
+/**
+ * Renders DOM for an actual test state
+ *
+ * @param els - The DOM elements used by the typing test.
+ * @param textsCfg - The configuration of texts.
+ */
 export function renderTest(els: Elements, textsCfg: TextsCfg) {
   const text = generateText(textsCfg);
 
@@ -11,10 +17,12 @@ export function renderTest(els: Elements, textsCfg: TextsCfg) {
 }
 
 /**
- * Attaches focus and blur listeners to `typingInput` before the test starts.
+ * Attaches focus and blur listeners to the typing input before the test starts.
  *
- * Allows clicking the `textPlaceholder` element or pressing any key
- * to focus `typingInput`.
+ * Allows the user to focus the input either by clicking the placeholder or by pressing
+ * any printable key when the placeholder is active.
+ *
+ * @param els - The DOM elements used by the typing test.
  */
 export function setFocusActionsOnTypingInput(els: Elements) {
   els.typingInput.focus();
@@ -40,6 +48,11 @@ export function setFocusActionsOnTypingInput(els: Elements) {
     }
   });
 
+  /**
+   * Focuses the typing input when the user presses a printable key while the placeholder is active.
+   *
+   * @param e - The keyboard event that triggered the handler.
+   */
   function onKeyDown(e: KeyboardEvent) {
     if (
       ![
@@ -62,6 +75,12 @@ export function setFocusActionsOnTypingInput(els: Elements) {
   }
 }
 
+/**
+ * Builds the passive text view by inserting the generated words and spaces into the DOM.
+ *
+ * @param els - The DOM elements used to render the passive text.
+ * @param text - The array of words that should be displayed.
+ */
 function initPassiveText(els: Elements, text: string[]) {
   els.passiveText.innerHTML = '';
   let wordKey = '';

@@ -10,6 +10,9 @@ import {
 import { initSettings } from './settings/settingsStore';
 import { getTextsCfg } from './text/textsConfig';
 
+/**
+ * Initializes the application.
+ */
 function main() {
   const els = getElements();
   const textsCfg = getTextsCfg();
