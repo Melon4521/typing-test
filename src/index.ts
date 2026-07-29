@@ -1,5 +1,5 @@
 import { getElements } from './render/dom';
-import { renderTest } from './render/render';
+import { renderTest, setFocusActionsOnTypingInput } from './render/render';
 import { getSettingsCfg } from './settings/settingsConfig';
 import {
   attachSettingsValueChangeListener,
@@ -21,6 +21,8 @@ function main() {
   initSettingsMode(els, settingsCfg);
   initSettingsValue(els, settingsCfg);
   attachSettingsValueChangeListener(els);
+
+  setFocusActionsOnTypingInput(els);
 
   // тест
   renderTest(els, textsCfg);

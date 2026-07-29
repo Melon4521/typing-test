@@ -35,7 +35,7 @@ main();
 //<Test>==============================================================================
 
 function newTest() {
-  focusTypingInput();
+  focusTypingInput(); // DONE: код перенесен
 
   const typingInput = document.querySelector('#typing-input');
   typingInput.value = '';
@@ -586,6 +586,7 @@ function removeChar(charIndex, wordKey, incorrectInEnd = false, all = false) {
 
 //</Visual Text>==============================================================================
 
+// DONE: код перенесен
 function settingsPanelInit(settingsJson) {
   const settingsLang = document.querySelector('#settings-lang');
   const settingsMode = document.querySelector('#settings-mode');
@@ -721,6 +722,7 @@ function settingsPanelInit(settingsJson) {
   }
 }
 
+// DONE: код перенесен
 function settingsPanelHide(hide) {
   const settingsPanel = document.querySelector('#settings-panel');
 
@@ -731,6 +733,7 @@ function settingsPanelHide(hide) {
   }
 }
 
+// DONE: код перенесен
 function generateText(textsJson) {
   const settingsMode = localStorage.getItem('settings-mode') || 'words';
   const settingsLang = localStorage.getItem('settings-lang') || 'ru';
@@ -798,6 +801,7 @@ function generateText(textsJson) {
   }
 }
 
+// DONE: код перенесен
 function initPassiveText(text) {
   const passiveText = document.querySelector('#passive-text');
   passiveText.innerHTML = '';
@@ -822,6 +826,7 @@ function initPassiveText(text) {
   passiveText.children[0].remove();
 }
 
+// DONE: код перенесен
 function setFocusActionsOnTypingInput() {
   const typingInput = document.querySelector('#typing-input');
   const placeholder = document.querySelector('.text__placeholder');
@@ -871,6 +876,7 @@ function setFocusActionsOnTypingInput() {
   }
 }
 
+// DONE: код перенесен
 function focusTypingInput() {
   const typingInput = document.querySelector('#typing-input');
   typingInput.focus();
