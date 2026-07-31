@@ -109,3 +109,16 @@ export interface LastIncorrectWord {
   charIndex: number;
   incorrectTypedCharsInEndCount: number;
 }
+
+/**
+ * Represents statistic of finished test.
+ */
+export interface TestStatistics {
+  wpm: number;
+  cpm: number;
+  accuracy: number;
+  errorStats: Record<
+    string,
+    Pick<WordStatistic, 'incorrects' | 'incorrectTypedCharsInEnd'>
+  >;
+}
