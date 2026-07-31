@@ -28,7 +28,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
   const checkedLangValue = settingsCfg.lang.checkedValue;
   const uncheckedLangValue = settingsCfg.lang.uncheckedValue;
 
-  // prevent text selection
+  // Prevent text selection
   els.settingsLang.onmousedown = () => {
     return false;
   };
@@ -58,7 +58,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
     ? checkedLangValue
     : uncheckedLangValue;
 
-  // language change
+  // Attach language change listener
   langCheckbox.addEventListener('change', function () {
     if (!isHidden(els.settingsPanel)) {
       const pickedLang = langCheckbox.checked
@@ -81,7 +81,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
  * @param settingsCfg - The settings configuration for mode options.
  */
 export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
-  // prevent text selection
+  // Prevent text selection
   els.settingsMode.onmousedown = () => {
     return false;
   };
@@ -102,13 +102,13 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
     );
   }
 
-  // select the appropriate mode
+  // Select the appropriate mode
   const modeFirstRadio = els.settingsMode.querySelector(
     `input[value='${mode}']`,
   ) as HTMLInputElement;
   modeFirstRadio.checked = true;
 
-  // delegate mode changes
+  // Delegate mode changes
   els.settingsMode.addEventListener('change', function (e) {
     if (
       !isHidden(els.settingsPanel) &&
@@ -133,7 +133,7 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
  * @param settingsCfg - The settings configuration for available values.
  */
 export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
-  // prevent text selection
+  // Prevent text selection
   els.settingsValue.onmousedown = () => {
     return false;
   };
@@ -170,7 +170,7 @@ export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
  * @param els - The DOM elements used by the settings panel.
  */
 export function attachSettingsValueChangeListener(els: Elements) {
-  // delegate value changes
+  // Delegate value changes
   els.settingsValue.addEventListener('change', function (e) {
     if (
       !isHidden(els.settingsPanel) &&
