@@ -1,0 +1,33 @@
+import type { Mode, TestState } from './types';
+
+/**
+ * Creates test state object with defaults for new typing test
+ *
+ * @param text - array of current test's words
+ * @param mode - current mode of test
+ */
+export function newTestState(text: string[], mode: Mode): TestState {
+  return {
+    text: text.join(' '),
+    words: [...text],
+    chars: text.reduce((chars: string[], word) => {
+      return [...chars, ' ', ...word];
+    }, []),
+    statistic: {},
+    mode,
+    currentWordIndex: 0,
+    currentCharIndex: 0,
+    activeWord: null,
+    typedWords: [],
+    lastIncorrectWord: null,
+    incorrectTypedCharsInEndCount: 0,
+    incorrectTypedChars: new Set(),
+    prevInputLength: 0,
+    newInputLength: 0,
+    startTime: 0,
+    endTime: 0,
+    status: 'idle',
+    abortTimeoutId: null,
+    finishTimeoutId: null,
+  };
+}
