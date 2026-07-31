@@ -64,7 +64,7 @@ export function isTimeValue(value: unknown): value is TimeValue {
 export type AllowedWordsCount = WordsValue | 500;
 
 /**
- * Represents state of the typing test
+ * Represents state of the typing test.
  */
 export interface TestState {
   text: string;
@@ -91,7 +91,7 @@ export interface TestState {
 export type TestStatus = 'idle' | 'running' | 'finished' | 'aborted';
 
 /**
- * Represents statistic of typed word
+ * Represents statistic of typed word.
  */
 export interface WordStatistic {
   corrects: string[];
@@ -101,7 +101,7 @@ export interface WordStatistic {
 }
 
 /**
- * Represents statistic of previous incorrect typed word
+ * Represents statistic of previous incorrect typed word.
  */
 export interface LastIncorrectWord {
   value: string;
