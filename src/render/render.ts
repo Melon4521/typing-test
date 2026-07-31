@@ -100,6 +100,6 @@ function initPassiveText(els: Elements, text: string[]) {
     wordKey += ' ';
   }
 
-  // first space
+  // Remove first space
   els.passiveText.children[0].remove();
 }
