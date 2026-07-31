@@ -10,9 +10,7 @@ export function newTestState(text: string[], mode: Mode): TestState {
   return {
     text: text.join(' '),
     words: [...text],
-    chars: text.reduce((chars: string[], word) => {
-      return [...chars, ' ', ...word];
-    }, []),
+    chars: text.join(' ').split(''),
     statistic: {},
     mode,
     currentWordIndex: 0,
