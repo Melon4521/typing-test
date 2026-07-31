@@ -32,7 +32,9 @@ export interface SettingsStore {
   setWordsValue(value: WordsValue): void;
   setTimeValue(value: TimeValue): void;
 
-  // ensureValueForMode returns the value matching the selected mode and writes it to localStorage
+  /**
+   * Returns the value matching the selected mode and writes it to localStorage
+   */
   ensureValueForMode(mode: Mode): WordsValue | TimeValue;
 }
 
