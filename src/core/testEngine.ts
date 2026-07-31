@@ -32,6 +32,25 @@ export function newTestState(text: string[], mode: Mode): TestState {
 }
 
 /**
+ * Processes addition of typed char by mutating test state.
+ *
+ * @param state - State of running test.
+ * @param char - Added char.
+ */
+export function typeChar(state: TestState, char: string) {
+  console.log('typeChar', state, char);
+}
+
+/**
+ * Processes deletion of char by mutating test state.
+ *
+ * @param state - State of running test.
+ */
+export function deleteChar(state: TestState) {
+  console.log('deleteChar', state);
+}
+
+/**
  * Calculates final statistics of finished test.
  *
  * @param state - State object of finished test.
