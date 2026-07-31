@@ -62,3 +62,50 @@ export function isTimeValue(value: unknown): value is TimeValue {
 }
 
 export type AllowedWordsCount = WordsValue | 500;
+
+/**
+ * Represents state of the typing test
+ */
+export interface TestState {
+  text: string;
+  words: string[];
+  chars: string[];
+  statistic: Record<string, WordStatistic>;
+  mode: Mode;
+  currentWordIndex: number;
+  currentCharIndex: number;
+  activeWord: string | null;
+  typedWords: string[];
+  lastIncorrectWord: LastIncorrectWord | null;
+  incorrectTypedCharsInEndCount: number;
+  incorrectTypedChars: Set<string>;
+  prevInputLength: number;
+  newInputLength: number;
+  startTime: number;
+  endTime: number;
+  status: TestStatus;
+  abortTimeoutId: number | null;
+  finishTimeoutId: number | null;
+}
+
+export type TestStatus = 'idle' | 'running' | 'finished' | 'aborted';
+
+/**
+ * Represents statistic of typed word
+ */
+export interface WordStatistic {
+  corrects: string[];
+  incorrects: string[];
+  chars: Record<string, number | string>;
+  incorrectTypedCharsInEnd: string;
+}
+
+/**
+ * Represents statistic of previous incorrect typed word
+ */
+export interface LastIncorrectWord {
+  value: string;
+  wordIndex: number;
+  charIndex: number;
+  incorrectTypedCharsInEndCount: number;
+}
