@@ -1,4 +1,4 @@
-import type { Mode, TestState } from './types';
+import type { Mode, TestState, TestStatistics } from './types';
 
 /**
  * Creates test state object with defaults for new typing test.
@@ -28,5 +28,39 @@ export function newTestState(text: string[], mode: Mode): TestState {
     status: 'idle',
     abortTimeoutId: null,
     finishTimeoutId: null,
+  };
+}
+
+/**
+ * Calculates final statistics of finished test.
+ *
+ * @param state - State object of finished test.
+ * @returns Statistics of finished test.
+ */
+export function finishTest(state: TestState): TestStatistics {
+  const [totalMilliseconds, totalCharsCount] = Object.values(
+    state.statistic,
+  ).reduce(
+    function ([sum, count], wordStatistic) {
+      for (const key in wordStatistic.chars) {
+        const timeDelta = wordStatistic.chars[key];
+        if (typeof timeDelta === 'number' && timeDelta !== 0) {
+          sum += timeDelta;
+          count++;
+        }
+      }
+
+      return [sum, count];
+    },
+    [0, 0],
+  );
+
+  const totalMinutes = totalMilliseconds / 1000 / 60;
+
+  return {
+    wpm: state.words.length / totalMinutes,
+    cpm: totalCharsCount / totalMinutes,
+    accuracy: (1 - state.incorrectTypedChars.size / totalCharsCount) * 100,
+    errorStats: state.statistic,
   };
 }
