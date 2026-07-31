@@ -1,10 +1,11 @@
 import type { Mode, TestState } from './types';
 
 /**
- * Creates test state object with defaults for new typing test
+ * Creates test state object with defaults for new typing test.
  *
- * @param text - array of current test's words
- * @param mode - current mode of test
+ * @param text - Array of current test's words.
+ * @param mode - Current mode of test.
+ * @returns Test state object.
  */
 export function newTestState(text: string[], mode: Mode): TestState {
   return {
