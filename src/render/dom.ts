@@ -3,6 +3,7 @@
  */
 export interface Elements {
   textPlaceholder: HTMLElement;
+  textBody: HTMLElement;
   typingInput: HTMLInputElement;
   visualText: HTMLElement;
   passiveText: HTMLElement;
@@ -24,6 +25,7 @@ export interface Elements {
 export function getElements(): Elements {
   return {
     textPlaceholder: document.querySelector('.text__placeholder')!,
+    textBody: document.querySelector('.text__body')!,
     typingInput: document.querySelector('#typing-input')!,
     visualText: document.querySelector('#visual-text')!,
     passiveText: document.querySelector('#passive-text')!,
