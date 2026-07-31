@@ -131,7 +131,7 @@ body {
 .text__body {
   height: 100%;
   position: relative;
-  overflow-y: hidden;
+  overflow: hidden;
   cursor: default;
 }
 .text__input {
