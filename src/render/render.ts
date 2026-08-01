@@ -3,6 +3,82 @@ import type { TextsCfg } from '../text/textsConfig';
 import type { Elements } from './dom';
 
 /**
+ * Renders DOM for an actual test state.
+ *
+ * @param els - The DOM elements used by the typing test.
+ * @param state - State of running test.
+ */
+function renderTest(els: Elements, state: TestState) {
+  // Clear visual text
+  els.visualText.innerHTML = '';
+
+  for (
+    let wordIndex = 0;
+    wordIndex <
+    [...state.typedWords, state.activeWord === null ? '' : state.activeWord]
+      .length;
+    wordIndex++
+  ) {
+    const wordSpan = document.createElement('span');
+
+    // If it isn't the last word that user has just started typing
+    if (!(wordIndex === state.typedWords.length && state.activeWord === null)) {
+      // Get key of an iterable word for state.statistic
+      const statisticKey = state.words.slice(0, wordIndex + 1).join(' ');
+      const word = state.words[wordIndex];
+      const wordStatistic = state.statistic[statisticKey];
+      const currentlyTyped = wordStatistic.currentlyTyped;
+      const wordInPassiveText = els.passiveText.querySelector(
+        `[data-key="${statisticKey}"]`,
+      ) as HTMLSpanElement;
+
+      // Change passive text
+      wordInPassiveText.textContent =
+        currentlyTyped.replaceAll(' ', '_') +
+        word.slice(currentlyTyped.length) +
+        wordStatistic.incorrectTypedCharsInEnd;
+
+      for (let charIndex = 0; charIndex < currentlyTyped.length; charIndex++) {
+        const charSpan = document.createElement('span');
+        const isCharCorrect = currentlyTyped[charIndex] === word[charIndex];
+
+        charSpan.textContent =
+          currentlyTyped[charIndex] === ' ' ? '_' : currentlyTyped[charIndex];
+        charSpan.classList.add(
+          isCharCorrect ? 'correct-char' : 'incorrect-char',
+        );
+
+        wordSpan.append(charSpan);
+      }
+
+      if (wordStatistic.incorrectTypedCharsInEnd !== '') {
+        const incorrectTypedCharsSpan = document.createElement('span');
+
+        incorrectTypedCharsSpan.textContent =
+          wordStatistic.incorrectTypedCharsInEnd;
+        incorrectTypedCharsSpan.classList.add('incorrect-char');
+        incorrectTypedCharsSpan.classList.add('incorrect-in-end');
+        wordSpan.append(incorrectTypedCharsSpan);
+      }
+    }
+
+    // Add space before current word (if it isn't first word)
+    if (wordIndex !== 0) {
+      els.visualText.append(' ');
+    }
+
+    els.visualText.append(wordSpan);
+  }
+
+  // Add typingCaret into the last word
+  if (els.visualText.children.length !== 0) {
+    const activeWordSpan = els.visualText.lastElementChild as HTMLSpanElement;
+
+    activeWordSpan.classList.add('active-word');
+    activeWordSpan.append(els.typingCaret);
+    updateScrollPosition(els, activeWordSpan);
+  }
+}
 /**
  * Sets DOM initial state and attaches listeners to the typingInput element with test logic.
  *
