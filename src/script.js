@@ -94,6 +94,7 @@ function newTest() {
   let startTime = 0;
   let endTime = 0;
 
+  // DONE: code moved
   // start the test on input
   typingInput.oninput = function (e) {
     // interrupt the test when typingInput has been out of focus for more than 5 seconds
@@ -315,7 +316,9 @@ function newTest() {
     // console.log(typingInput.value, typingInput.value.length);
   };
 
+  // DONE: code moved
   typingInput.onkeydown = e => {
+    // DONE: code moved
     // arrow/delete keys were pressed - ignore them
     if (
       ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete'].includes(
@@ -325,6 +328,7 @@ function newTest() {
       e.preventDefault();
     }
 
+    // DONE: code moved
     // move to the previous word
     if (
       e.code == 'Backspace' &&
@@ -350,6 +354,7 @@ function newTest() {
       console.log('remove', incorrectTypedCharsInEnd);
     }
 
+    // DONE: code moved
     // Ctrl + Backspace
     if (e.code == 'Backspace' && e.ctrlKey && typingInput.value.length != 0) {
       e.preventDefault();
@@ -380,6 +385,7 @@ function newTest() {
   };
 }
 
+// DONE: code moved
 function finishTest(test, incorrectTypedChars) {
   console.log(test);
   const typingInput = document.querySelector('#typing-input');
@@ -422,6 +428,7 @@ function finishTest(test, incorrectTypedChars) {
 
 let testAbortTimeoutId = null;
 
+// DONE: code moved
 function abortTest() {
   console.log('Тест прерван');
 
