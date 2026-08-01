@@ -1,3 +1,12 @@
+import {
+  deleteChar,
+  finishTest,
+  newTestState,
+  typeChar,
+} from '../core/testEngine';
+import type { TestState, TestStatistics } from '../core/types';
+import { settingsPanelHide } from '../settings/settingsPanel';
+import { settingsStore } from '../settings/settingsStore';
 import { generateText } from '../text/textGenerator';
 import type { TextsCfg } from '../text/textsConfig';
 import type { Elements } from './dom';
