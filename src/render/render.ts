@@ -268,6 +268,33 @@ export function newTest(els: Elements, textsCfg: TextsCfg) {
     renderTest(els, state);
   };
 }
+
+/**
+ * Aborts running test by creating new test.
+ *
+ * Hides btnRepeat, shows settingsPanel and clears finishTimeoutId if current mode is `time`
+ *
+ * @param testState - Test state object of running typing test.
+ * @param els - The DOM elements used by the typing test.
+ * @param textsCfg - The configuration of texts.
+ */
+function abortTest(state: TestState, els: Elements, textsCfg: TextsCfg) {
+  console.log('Тест прерван.');
+
+  // Hide the btnRepeat
+  if (!els.btnRepeat.classList.contains('_hidden')) {
+    els.btnRepeat.classList.add('_hidden');
+  }
+
+  // Show the settings panel
+  settingsPanelHide(els.settingsPanel, false);
+
+  if (state.mode === 'time' && state.finishTimeoutId !== null) {
+    clearTimeout(state.finishTimeoutId);
+  }
+
+  // Create new test
+  newTest(els, textsCfg);
 }
 
 /**
