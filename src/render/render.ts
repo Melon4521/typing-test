@@ -470,3 +470,22 @@ function initPassiveText(els: Elements, text: string[]) {
   // Remove first space
   els.passiveText.children[0].remove();
 }
+
+/**
+ * Changes position of
+ *
+ * @param els - The DOM elements used to render the passive text.
+ * @param activeWordSpan - The DOM element of current activeWord.
+ */
+function updateScrollPosition(els: Elements, activeWordSpan: HTMLElement) {
+  const lineHeight = parseFloat(getComputedStyle(els.visualText).lineHeight);
+  // Current line with active word
+  const lineIndex = Math.round(activeWordSpan.offsetTop / lineHeight);
+  // On which of the visible lines the active word is located
+  const visibleLines = 2;
+
+  const offset = -Math.max(0, lineIndex - (visibleLines - 1)) * lineHeight;
+
+  els.visualText.style.top = `${offset}px`;
+  els.passiveText.style.top = `${offset}px`;
+}
