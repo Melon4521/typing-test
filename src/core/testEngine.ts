@@ -183,7 +183,50 @@ export function typeChar(
  * @param state - State of running test.
  */
 export function deleteChar(state: TestState) {
-  console.log('deleteChar', state);
+  if (state.activeWord !== null) {
+    // Get key of current word for state.statistic
+    const statisticKey =
+      state.currentWordIndex === 0
+        ? state.words[0]
+        : state.typedWords.join(' ') +
+          ' ' +
+          state.words[state.currentWordIndex];
+    const wordStatistic = state.statistic[statisticKey];
+
+    if (state.currentCharIndex <= state.activeWord.length) {
+      const previousWordState = state.activeWord.slice(
+        0,
+        state.currentCharIndex,
+      );
+
+      const correctIndex = wordStatistic.corrects.indexOf(previousWordState);
+      if (correctIndex !== -1) {
+        wordStatistic.corrects.splice(correctIndex, 1);
+      } else {
+        const incorrectIndex =
+          wordStatistic.incorrects.indexOf(previousWordState);
+        if (incorrectIndex !== -1)
+          wordStatistic.incorrects.splice(incorrectIndex, 1);
+      }
+
+      if (typeof wordStatistic.chars[previousWordState] == 'number') {
+        delete wordStatistic.chars[previousWordState];
+      }
+
+      state.startTime = Date.now();
+    } else {
+      state.incorrectTypedCharsInEndCount--;
+      wordStatistic.incorrectTypedCharsInEnd =
+        wordStatistic.incorrectTypedCharsInEnd.slice(0, -1);
+    }
+
+    state.currentCharIndex--;
+    state.prevInputLength = state.newInputLength;
+
+    if (state.currentCharIndex < state.activeWord.length) {
+      wordStatistic.currentlyTyped = wordStatistic.currentlyTyped.slice(0, -1);
+    }
+  }
 }
 
 /**
