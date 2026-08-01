@@ -152,11 +152,19 @@ body {
   width: 100%;
   top: 0;
   left: 0;
+
+  transition: top 0.2s ease-in;
+
+  /* A fix for the issue where the .text__visual becomes slightly wider than the .text__passive */
+  font-kerning: none;
+  font-variant-ligatures: none;
+  font-feature-settings:
+    'kern' 0,
+    'liga' 0,
+    'calt' 0;
 }
 .text__passive {
   z-index: 1;
-
-  transition: top 0.2s ease-in;
 }
 .text__visual {
   z-index: 2;
@@ -164,11 +172,17 @@ body {
   display: inline-block;
   color: var(--text-color);
 }
+.text__visual > span {
+  display: inline-block;
+  min-height: 1.65em;
+  vertical-align: top;
+}
 .text__visual > span > span {
   min-height: 1.65em;
   vertical-align: top;
   white-space: pre;
 }
+
 .text__visual .correct-char {
   color: var(--text-color);
 }
@@ -222,7 +236,6 @@ body {
 
 .active-word {
   position: relative;
-  display: inline-block;
 }
 
 .text__caret {
