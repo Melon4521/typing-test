@@ -36,9 +36,145 @@ export function newTestState(text: string[], mode: Mode): TestState {
  *
  * @param state - State of running test.
  * @param char - Added char.
+ * @returns `shoudCleanInput` - Clean typing input or not;
+ * @returns `testStatistics` - Object with test stats of finished test or null;
  */
-export function typeChar(state: TestState, char: string) {
-  console.log('typeChar', state, char);
+export function typeChar(
+  state: TestState,
+  char: string,
+): {
+  shoudCleanInput: boolean;
+  testStatistics: TestStatistics | null;
+} {
+  const currentWord = state.words[state.currentWordIndex];
+
+  // Get key of current word for state.statistic
+  const statisticKey =
+    state.currentWordIndex === 0
+      ? state.words[0]
+      : state.typedWords.join(' ') + ' ' + state.words[state.currentWordIndex];
+  const wordStatistic = state.statistic[statisticKey];
+  const wordState = currentWord.slice(0, state.currentCharIndex + 1);
+
+  // It isn't an end of the word
+  if (currentWord[state.currentCharIndex] !== undefined) {
+    state.endTime = Date.now();
+
+    // Correct char was typed
+    if (char === currentWord[state.currentCharIndex]) {
+      wordStatistic.corrects.push(wordState);
+
+      if (wordStatistic.chars[wordState] !== undefined) {
+        wordStatistic.chars[wordState] =
+          state.endTime - Number(wordStatistic.chars[wordState]);
+      } else {
+        wordStatistic.chars[wordState] = state.endTime - state.startTime;
+      }
+    } else {
+      // Incorrect char was typed
+      wordStatistic.incorrects.push(wordState);
+      state.incorrectTypedChars.add(
+        state.currentWordIndex == 0
+          ? wordState
+          : state.typedWords.join(' ') + ' ' + wordState,
+      );
+
+      if (wordStatistic.chars[wordState] === undefined) {
+        wordStatistic.chars[wordState] = String(state.startTime);
+      }
+    }
+
+    if (state.currentCharIndex < currentWord.length) {
+      wordStatistic.currentlyTyped = wordStatistic.currentlyTyped + char;
+    }
+
+    state.currentCharIndex++;
+    state.startTime = Date.now();
+    state.prevInputLength = state.newInputLength;
+  } else {
+    // It is an end of the word
+
+    // A space is expected to move to the next word
+    if (char === ' ') {
+      state.endTime = Date.now();
+
+      if (state.lastIncorrectWord !== null) {
+        const prevWordStatistic = state.statistic[state.typedWords.join(' ')];
+
+        for (const key of prevWordStatistic.incorrects) {
+          prevWordStatistic.chars[key] =
+            state.endTime - Number(prevWordStatistic.chars[key]);
+        }
+      }
+
+      if (
+        wordStatistic.incorrects.length === 0 &&
+        state.incorrectTypedCharsInEndCount == 0
+      ) {
+        state.lastIncorrectWord = null;
+      } else {
+        state.lastIncorrectWord = {
+          value: wordStatistic.currentlyTyped,
+          wordIndex: state.currentWordIndex,
+          charIndex: state.currentCharIndex,
+          incorrectTypedCharsInEndCount: state.incorrectTypedCharsInEndCount,
+        };
+      }
+
+      state.startTime = Date.now();
+      state.currentWordIndex++;
+      state.typedWords.push(currentWord);
+      state.activeWord = null;
+      state.incorrectTypedCharsInEndCount = 0;
+      return {
+        shoudCleanInput: true,
+        testStatistics: null,
+      };
+    } else {
+      // The user typed another char, not space
+      if (state.incorrectTypedCharsInEndCount < 5) {
+        state.incorrectTypedCharsInEndCount++;
+        wordStatistic.incorrectTypedCharsInEnd += char;
+        state.currentCharIndex++;
+        state.prevInputLength = state.newInputLength;
+      }
+    }
+  }
+
+  // End of the test
+  if (
+    state.mode === 'words' &&
+    state.currentWordIndex === state.words.length - 1 &&
+    state.currentCharIndex === currentWord.length
+  ) {
+    state.endTime = Date.now();
+
+    if (state.lastIncorrectWord !== null) {
+      const prevWordStatistic = state.statistic[state.typedWords.join(' ')];
+
+      for (const key of prevWordStatistic.incorrects) {
+        prevWordStatistic.chars[key] =
+          state.endTime - Number(prevWordStatistic.chars[key]);
+      }
+    }
+
+    if (wordStatistic.incorrects.length !== 0) {
+      for (const key of wordStatistic.incorrects) {
+        wordStatistic.chars[key] =
+          state.endTime - Number(wordStatistic.chars[key]);
+      }
+    }
+
+    return {
+      shoudCleanInput: false,
+      testStatistics: finishTest(state),
+    };
+  }
+
+  return {
+    shoudCleanInput: false,
+    testStatistics: null,
+  };
 }
 
 /**
