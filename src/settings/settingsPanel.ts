@@ -5,6 +5,8 @@ import {
   type WordsValue,
 } from '../core/types';
 import type { Elements } from '../render/dom';
+import { newTest } from '../render/render';
+import type { TextsCfg } from '../text/textsConfig';
 import type { SettingsCfg } from './settingsConfig';
 import { settingsStore } from './settingsStore';
 
@@ -24,7 +26,11 @@ function isHidden(container: HTMLElement) {
  * @param els - The DOM elements used by the settings panel.
  * @param settingsCfg - The settings configuration for language options.
  */
-export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
+export function initSettingsLang(
+  els: Elements,
+  settingsCfg: SettingsCfg,
+  textsCfg: TextsCfg,
+) {
   const checkedLangValue = settingsCfg.lang.checkedValue;
   const uncheckedLangValue = settingsCfg.lang.uncheckedValue;
 
@@ -68,8 +74,7 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
       langCheckboxSpan.textContent = langCheckbox.value = pickedLang;
       settingsStore.setLang(pickedLang);
 
-      // TODO: A new test call
-      // newTest();
+      newTest(els, textsCfg);
     }
   });
 }
@@ -80,7 +85,11 @@ export function initSettingsLang(els: Elements, settingsCfg: SettingsCfg) {
  * @param els - The DOM elements used by the settings panel.
  * @param settingsCfg - The settings configuration for mode options.
  */
-export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
+export function initSettingsMode(
+  els: Elements,
+  settingsCfg: SettingsCfg,
+  textsCfg: TextsCfg,
+) {
   // Prevent text selection
   els.settingsMode.onmousedown = () => {
     return false;
@@ -120,8 +129,7 @@ export function initSettingsMode(els: Elements, settingsCfg: SettingsCfg) {
 
       initSettingsValue(els, settingsCfg);
 
-      // TODO: A new test call
-      // newTest();
+      newTest(els, textsCfg);
     }
   });
 }
@@ -169,7 +177,10 @@ export function initSettingsValue(els: Elements, settingsCfg: SettingsCfg) {
  *
  * @param els - The DOM elements used by the settings panel.
  */
-export function attachSettingsValueChangeListener(els: Elements) {
+export function attachSettingsValueChangeListener(
+  els: Elements,
+  textsCfg: TextsCfg,
+) {
   // Delegate value changes
   els.settingsValue.addEventListener('change', function (e) {
     if (
@@ -183,8 +194,7 @@ export function attachSettingsValueChangeListener(els: Elements) {
         settingsStore.setTimeValue(Number(e.target.value) as TimeValue);
       }
 
-      // TODO: A new test call
-      // newTest();
+      newTest(els, textsCfg);
     }
   });
 }

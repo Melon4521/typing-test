@@ -20,10 +20,10 @@ function main() {
 
   // Settings panel initialization
   initSettings();
-  initSettingsLang(els, settingsCfg);
-  initSettingsMode(els, settingsCfg);
+  initSettingsLang(els, settingsCfg, textsCfg);
+  initSettingsMode(els, settingsCfg, textsCfg);
   initSettingsValue(els, settingsCfg);
-  attachSettingsValueChangeListener(els);
+  attachSettingsValueChangeListener(els, textsCfg);
 
   setFocusActionsOnTypingInput(els);
 
