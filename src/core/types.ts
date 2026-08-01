@@ -94,6 +94,7 @@ export type TestStatus = 'idle' | 'running' | 'finished' | 'aborted';
  * Represents statistic of typed word.
  */
 export interface WordStatistic {
+  currentlyTyped: string;
   corrects: string[];
   incorrects: string[];
   chars: Record<string, number | string>;
@@ -119,6 +120,9 @@ export interface TestStatistics {
   accuracy: number;
   errorStats: Record<
     string,
-    Pick<WordStatistic, 'incorrects' | 'incorrectTypedCharsInEnd'>
+    Pick<
+      WordStatistic,
+      'incorrects' | 'incorrectTypedCharsInEnd' | 'currentlyTyped'
+    >
   >;
 }
