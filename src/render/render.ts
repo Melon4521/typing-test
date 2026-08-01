@@ -79,6 +79,16 @@ function renderTest(els: Elements, state: TestState) {
     updateScrollPosition(els, activeWordSpan);
   }
 }
+
+/**
+ * Renders screen with statistics of finished test.
+ *
+ * @param stats - Statistics of finished test.
+ */
+function renderTestStatistics(stats: TestStatistics) {
+  console.log(stats);
+}
+
 /**
  * Sets DOM initial state and attaches listeners to the typingInput element with test logic.
  *
