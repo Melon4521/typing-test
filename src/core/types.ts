@@ -69,7 +69,6 @@ export type AllowedWordsCount = WordsValue | 500;
 export interface TestState {
   text: string;
   words: string[];
-  chars: string[];
   statistic: Record<string, WordStatistic>;
   mode: Mode;
   currentWordIndex: number;
