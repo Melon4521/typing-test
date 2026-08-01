@@ -11,7 +11,6 @@ export function newTestState(text: string[], mode: Mode): TestState {
   return {
     text: text.join(' '),
     words: [...text],
-    chars: text.join(' ').split(''),
     statistic: {},
     mode,
     currentWordIndex: 0,
@@ -256,7 +255,9 @@ export function finishTest(state: TestState): TestStatistics {
   const totalMinutes = totalMilliseconds / 1000 / 60;
 
   return {
-    wpm: state.words.length / totalMinutes,
+    wpm:
+      (state.mode === 'words' ? state.words.length : state.typedWords.length) /
+      totalMinutes,
     cpm: totalCharsCount / totalMinutes,
     accuracy: (1 - state.incorrectTypedChars.size / totalCharsCount) * 100,
     errorStats: state.statistic,
